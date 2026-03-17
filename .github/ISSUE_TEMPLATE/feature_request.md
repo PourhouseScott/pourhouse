@@ -18,9 +18,9 @@ What other options were evaluated?
 
 ## Acceptance criteria
 
-- [ ] 
-- [ ] 
-- [ ] 
+- [ ]
+- [ ]
+- [ ]
 
 ## Additional context
 

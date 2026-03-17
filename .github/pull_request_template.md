@@ -4,7 +4,7 @@ Describe what this pull request changes.
 
 ## Changes
 
-- 
+-
 
 ## Verification
 
