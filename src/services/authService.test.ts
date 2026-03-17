@@ -49,7 +49,13 @@ describe("AuthService", () => {
       createdAt
     });
 
-    const [createArg] = vi.mocked(userRepository.create).mock.calls[0];
+    const createCall = vi.mocked(userRepository.create).mock.calls[0];
+
+    if (!createCall) {
+      throw new Error("Expected create to be called");
+    }
+
+    const createArg = createCall[0];
     expect(createArg.password).not.toBe("plaintext-password");
     await expect(bcrypt.compare("plaintext-password", createArg.password)).resolves.toBe(true);
   });

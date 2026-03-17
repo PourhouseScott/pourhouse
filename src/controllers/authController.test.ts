@@ -22,7 +22,15 @@ describe("AuthController", () => {
       loginUser: vi.fn()
     } as unknown as AuthService;
 
-    vi.mocked(authService.registerUser).mockResolvedValue({ token: "t", user: { id: "u" } });
+    vi.mocked(authService.registerUser).mockResolvedValue({
+      token: "t",
+      user: {
+        id: "u",
+        email: "u@example.com",
+        name: "User",
+        createdAt: new Date("2026-01-01T00:00:00.000Z")
+      }
+    });
 
     const controller = new AuthController(authService);
     const req = { body: { email: "u@example.com" } } as Request;
@@ -32,7 +40,15 @@ describe("AuthController", () => {
 
     expect(authService.registerUser).toHaveBeenCalledWith(req.body);
     expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({ token: "t", user: { id: "u" } });
+    expect(res.json).toHaveBeenCalledWith({
+      token: "t",
+      user: {
+        id: "u",
+        email: "u@example.com",
+        name: "User",
+        createdAt: new Date("2026-01-01T00:00:00.000Z")
+      }
+    });
   });
 
   it("login returns 200 with payload", async () => {
@@ -41,7 +57,15 @@ describe("AuthController", () => {
       loginUser: vi.fn()
     } as unknown as AuthService;
 
-    vi.mocked(authService.loginUser).mockResolvedValue({ token: "t", user: { id: "u" } });
+    vi.mocked(authService.loginUser).mockResolvedValue({
+      token: "t",
+      user: {
+        id: "u",
+        email: "u@example.com",
+        name: "User",
+        createdAt: new Date("2026-01-01T00:00:00.000Z")
+      }
+    });
 
     const controller = new AuthController(authService);
     const req = { body: { email: "u@example.com" } } as Request;
@@ -51,6 +75,14 @@ describe("AuthController", () => {
 
     expect(authService.loginUser).toHaveBeenCalledWith(req.body);
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ token: "t", user: { id: "u" } });
+    expect(res.json).toHaveBeenCalledWith({
+      token: "t",
+      user: {
+        id: "u",
+        email: "u@example.com",
+        name: "User",
+        createdAt: new Date("2026-01-01T00:00:00.000Z")
+      }
+    });
   });
 });
