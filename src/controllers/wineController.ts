@@ -1,35 +1,33 @@
-import { Request, Response } from "express";
-import {
-  createWine,
-  getWineById,
-  getWineRatings,
-  getWines,
-  searchWines
-} from "../services/wineService";
+import type { Request, Response } from "express";
+import { WineService } from "@/services/wineService";
 
-export async function listWines(_req: Request, res: Response) {
-  const wines = await getWines();
-  res.status(200).json(wines);
-}
+export class WineController {
+  public constructor(private readonly wineService: WineService) { }
 
-export async function getWine(req: Request, res: Response) {
-  const wineId = req.params.id as string;
-  const wine = await getWineById(wineId);
-  res.status(200).json(wine);
-}
+  public listWines = async (_req: Request, res: Response) => {
+    const wines = await this.wineService.getWines();
+    res.status(200).json(wines);
+  };
 
-export async function addWine(req: Request, res: Response) {
-  const wine = await createWine(req.body);
-  res.status(201).json(wine);
-}
+  public getWine = async (req: Request, res: Response) => {
+    const wineId = req.params.id as string;
+    const wine = await this.wineService.getWineById(wineId);
+    res.status(200).json(wine);
+  };
 
-export async function searchWine(req: Request, res: Response) {
-  const wines = await searchWines(req.query.q as string);
-  res.status(200).json(wines);
-}
+  public addWine = async (req: Request, res: Response) => {
+    const wine = await this.wineService.createWine(req.body);
+    res.status(201).json(wine);
+  };
 
-export async function listWineRatings(req: Request, res: Response) {
-  const wineId = req.params.id as string;
-  const ratings = await getWineRatings(wineId);
-  res.status(200).json(ratings);
+  public searchWine = async (req: Request, res: Response) => {
+    const wines = await this.wineService.searchWines(req.query.q as string);
+    res.status(200).json(wines);
+  };
+
+  public listWineRatings = async (req: Request, res: Response) => {
+    const wineId = req.params.id as string;
+    const ratings = await this.wineService.getWineRatings(wineId);
+    res.status(200).json(ratings);
+  };
 }

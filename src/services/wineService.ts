@@ -1,7 +1,10 @@
-import { prisma } from "../config/prisma";
-import { AppError } from "../utils/appError";
+import type { IRegionRepository } from "@/repositories/region/IRegionRepository";
+import type { IRatingRepository } from "@/repositories/rating/IRatingRepository";
+import type { IWineRepository } from "@/repositories/wine/IWineRepository";
+import type { IWineryRepository } from "@/repositories/winery/IWineryRepository";
+import { AppError } from "@/utils/appError";
 
-type CreateWineInput = {
+export type CreateWineInput = {
   name: string;
   vintage: number;
   wineryId: string;
@@ -13,104 +16,64 @@ type CreateWineInput = {
   imageUrl: string;
 };
 
-export async function getWines() {
-  return prisma.wine.findMany({
-    include: {
-      winery: true,
-      region: true
-    },
-    orderBy: { createdAt: "desc" }
-  });
-}
+export class WineService {
+  public constructor(
+    private readonly wineRepository: IWineRepository,
+    private readonly wineryRepository: IWineryRepository,
+    private readonly regionRepository: IRegionRepository,
+    private readonly ratingRepository: IRatingRepository
+  ) { }
 
-export async function getWineById(id: string) {
-  const wine = await prisma.wine.findUnique({
-    where: { id },
-    include: {
-      winery: true,
-      region: true,
-      inventory: true
+  public async getWines() {
+    return this.wineRepository.findMany();
+  }
+
+  public async getWineById(id: string) {
+    const wine = await this.wineRepository.findByIdWithInventory(id);
+
+    if (!wine) {
+      throw new AppError("Wine not found", 404);
     }
-  });
 
-  if (!wine) {
-    throw new AppError("Wine not found", 404);
+    return wine;
   }
 
-  return wine;
-}
+  public async createWine(input: CreateWineInput) {
+    const winery = await this.wineryRepository.findById(input.wineryId);
+    const region = await this.regionRepository.findById(input.regionId);
 
-export async function createWine(input: CreateWineInput) {
-  const winery = await prisma.winery.findUnique({ where: { id: input.wineryId } });
-  const region = await prisma.region.findUnique({ where: { id: input.regionId } });
-
-  if (!winery) {
-    throw new AppError("Winery not found", 404);
-  }
-
-  if (!region) {
-    throw new AppError("Region not found", 404);
-  }
-
-  const existingWine = await prisma.wine.findUnique({
-    where: {
-      name_wineryId_vintage: {
-        name: input.name,
-        wineryId: input.wineryId,
-        vintage: input.vintage
-      }
+    if (!winery) {
+      throw new AppError("Winery not found", 404);
     }
-  });
 
-  if (existingWine) {
-    throw new AppError("Wine with the same name, winery, and vintage already exists", 409);
-  }
-
-  return prisma.wine.create({
-    data: input,
-    include: {
-      winery: true,
-      region: true
+    if (!region) {
+      throw new AppError("Region not found", 404);
     }
-  });
-}
 
-export async function searchWines(query: string) {
-  return prisma.wine.findMany({
-    where: {
-      OR: [
-        { name: { contains: query, mode: "insensitive" } },
-        { country: { contains: query, mode: "insensitive" } },
-        { winery: { name: { contains: query, mode: "insensitive" } } },
-        { region: { name: { contains: query, mode: "insensitive" } } }
-      ]
-    },
-    include: {
-      winery: true,
-      region: true
-    },
-    orderBy: { createdAt: "desc" }
-  });
-}
+    const existingWine = await this.wineRepository.findByUniqueNameWineryVintage({
+      name: input.name,
+      wineryId: input.wineryId,
+      vintage: input.vintage
+    });
 
-export async function getWineRatings(wineId: string) {
-  const wine = await prisma.wine.findUnique({ where: { id: wineId } });
+    if (existingWine) {
+      throw new AppError("Wine with the same name, winery, and vintage already exists", 409);
+    }
 
-  if (!wine) {
-    throw new AppError("Wine not found", 404);
+    return this.wineRepository.create(input);
   }
 
-  return prisma.rating.findMany({
-    where: { wineId },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true
-        }
-      }
-    },
-    orderBy: { createdAt: "desc" }
-  });
+  public async searchWines(query: string) {
+    return this.wineRepository.search(query);
+  }
+
+  public async getWineRatings(wineId: string) {
+    const wine = await this.wineRepository.findByIdWithInventory(wineId);
+
+    if (!wine) {
+      throw new AppError("Wine not found", 404);
+    }
+
+    return this.ratingRepository.findByWineId(wineId);
+  }
 }

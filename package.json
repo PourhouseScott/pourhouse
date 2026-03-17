@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "dev:full": "npm run db:up && npm run dev",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run --passWithNoTests",
@@ -56,6 +56,8 @@
     "prisma": "6.16.2",
     "supertest": "7.2.2",
     "ts-node-dev": "2.0.0",
+    "tsc-alias": "1.8.16",
+    "tsconfig-paths": "4.2.0",
     "tsx": "4.20.6",
     "typescript": "5.9.3",
     "vitest": "4.1.0"

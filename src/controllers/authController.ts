@@ -1,12 +1,16 @@
-import { Request, Response } from "express";
-import { loginUser, registerUser } from "../services/authService";
+import type { Request, Response } from "express";
+import { AuthService } from "@/services/authService";
 
-export async function register(req: Request, res: Response) {
-  const result = await registerUser(req.body);
-  res.status(201).json(result);
-}
+export class AuthController {
+  public constructor(private readonly authService: AuthService) { }
 
-export async function login(req: Request, res: Response) {
-  const result = await loginUser(req.body);
-  res.status(200).json(result);
+  public register = async (req: Request, res: Response) => {
+    const result = await this.authService.registerUser(req.body);
+    res.status(201).json(result);
+  };
+
+  public login = async (req: Request, res: Response) => {
+    const result = await this.authService.loginUser(req.body);
+    res.status(200).json(result);
+  };
 }

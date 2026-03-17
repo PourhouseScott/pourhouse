@@ -1,7 +1,8 @@
-import { prisma } from "../config/prisma";
-import { AppError } from "../utils/appError";
+import type { IInventoryRepository } from "@/repositories/inventory/IInventoryRepository";
+import type { IWineRepository } from "@/repositories/wine/IWineRepository";
+import { AppError } from "@/utils/appError";
 
-type CreateInventoryInput = {
+export type CreateInventoryInput = {
   wineId: string;
   locationId: string;
   priceGlass: number;
@@ -11,7 +12,7 @@ type CreateInventoryInput = {
   isFeatured?: boolean;
 };
 
-type UpdateInventoryInput = {
+export type UpdateInventoryInput = {
   locationId?: string;
   priceGlass?: number;
   priceBottle?: number;
@@ -20,71 +21,47 @@ type UpdateInventoryInput = {
   isFeatured?: boolean;
 };
 
-export async function getInventory() {
-  return prisma.inventory.findMany({
-    include: {
-      wine: {
-        include: {
-          winery: true,
-          region: true
-        }
-      }
-    },
-    orderBy: { createdAt: "desc" }
-  });
-}
+export class InventoryService {
+  public constructor(
+    private readonly inventoryRepository: IInventoryRepository,
+    private readonly wineRepository: IWineRepository
+  ) { }
 
-export async function getInventoryById(id: string) {
-  const inventory = await prisma.inventory.findUnique({
-    where: { id },
-    include: {
-      wine: {
-        include: {
-          winery: true,
-          region: true
-        }
-      }
+  public async getInventory() {
+    return this.inventoryRepository.findMany();
+  }
+
+  public async getInventoryById(id: string) {
+    const inventory = await this.inventoryRepository.findById(id);
+
+    if (!inventory) {
+      throw new AppError("Inventory item not found", 404);
     }
-  });
 
-  if (!inventory) {
-    throw new AppError("Inventory item not found", 404);
+    return inventory;
   }
 
-  return inventory;
-}
+  public async createInventory(input: CreateInventoryInput) {
+    const wine = await this.wineRepository.findByIdWithInventory(input.wineId);
 
-export async function createInventory(input: CreateInventoryInput) {
-  const wine = await prisma.wine.findUnique({ where: { id: input.wineId } });
+    if (!wine) {
+      throw new AppError("Wine not found", 404);
+    }
 
-  if (!wine) {
-    throw new AppError("Wine not found", 404);
-  }
-
-  return prisma.inventory.create({
-    data: {
-      wineId: input.wineId,
+    return this.inventoryRepository.create({
+      wine: { connect: { id: input.wineId } },
       locationId: input.locationId,
       priceGlass: input.priceGlass,
       priceBottle: input.priceBottle,
       stockQuantity: input.stockQuantity,
       isAvailable: input.isAvailable ?? true,
       isFeatured: input.isFeatured ?? false
-    },
-    include: {
-      wine: true
-    }
-  });
-}
+    });
+  }
 
-export async function updateInventory(id: string, input: UpdateInventoryInput) {
-  await getInventoryById(id);
+  public async updateInventory(id: string, input: UpdateInventoryInput) {
+    await this.getInventoryById(id);
 
-  return prisma.inventory.update({
-    where: { id },
-    data: input,
-    include: {
-      wine: true
-    }
-  });
+    return this.inventoryRepository.update(id, input);
+  }
 }

@@ -1,46 +1,36 @@
-import { prisma } from "../config/prisma";
-import { AppError } from "../utils/appError";
+import type { IRatingRepository } from "@/repositories/rating/IRatingRepository";
+import type { IWineRepository } from "@/repositories/wine/IWineRepository";
+import { AppError } from "@/utils/appError";
 
-type CreateRatingInput = {
+export type CreateRatingInput = {
   userId: string;
   wineId: string;
   rating: number;
   notes: string;
 };
 
-export async function createRating(input: CreateRatingInput) {
-  if (input.rating < 1 || input.rating > 5) {
-    throw new AppError("Rating must be between 1 and 5", 400);
-  }
+export class RatingService {
+  public constructor(
+    private readonly ratingRepository: IRatingRepository,
+    private readonly wineRepository: IWineRepository
+  ) { }
 
-  const wine = await prisma.wine.findUnique({ where: { id: input.wineId } });
+  public async createRating(input: CreateRatingInput) {
+    if (input.rating < 1 || input.rating > 5) {
+      throw new AppError("Rating must be between 1 and 5", 400);
+    }
 
-  if (!wine) {
-    throw new AppError("Wine not found", 404);
-  }
+    const wine = await this.wineRepository.findByIdWithInventory(input.wineId);
 
-  return prisma.rating.create({
-    data: {
-      userId: input.userId,
-      wineId: input.wineId,
+    if (!wine) {
+      throw new AppError("Wine not found", 404);
+    }
+
+    return this.ratingRepository.create({
+      user: { connect: { id: input.userId } },
+      wine: { connect: { id: input.wineId } },
       rating: input.rating,
       notes: input.notes
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true
-        }
-      },
-      wine: {
-        select: {
-          id: true,
-          name: true,
-          vintage: true
-        }
-      }
-    }
-  });
+    });
+  }
 }

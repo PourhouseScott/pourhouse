@@ -1,81 +1,79 @@
 import bcrypt from "bcrypt";
-import { prisma } from "../config/prisma";
-import { AppError } from "../utils/appError";
-import { signToken } from "../utils/jwt";
+import type { IUserRepository } from "@/repositories/user/IUserRepository";
+import { AppError } from "@/utils/appError";
+import { signToken } from "@/utils/jwt";
 
-type RegisterInput = {
+export type RegisterInput = {
   email: string;
   password: string;
   name: string;
 };
 
-type LoginInput = {
+export type LoginInput = {
   email: string;
   password: string;
 };
 
-export async function registerUser(input: RegisterInput) {
-  const existingUser = await prisma.user.findUnique({
-    where: { email: input.email }
-  });
+export class AuthService {
+  public constructor(private readonly userRepository: IUserRepository) { }
 
-  if (existingUser) {
-    throw new AppError("Email already in use", 409);
-  }
+  public async registerUser(input: RegisterInput) {
+    const existingUser = await this.userRepository.findByEmail(input.email);
 
-  const hashedPassword = await bcrypt.hash(input.password, 10);
+    if (existingUser) {
+      throw new AppError("Email already in use", 409);
+    }
 
-  const user = await prisma.user.create({
-    data: {
+    const hashedPassword = await bcrypt.hash(input.password, 10);
+
+    const user = await this.userRepository.create({
       email: input.email,
       password: hashedPassword,
       name: input.name
-    }
-  });
+    });
 
-  const token = signToken({
-    userId: user.id,
-    email: user.email
-  });
+    const token = signToken({
+      userId: user.id,
+      email: user.email
+    });
 
-  return {
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.createdAt
-    }
-  };
-}
-
-export async function loginUser(input: LoginInput) {
-  const user = await prisma.user.findUnique({
-    where: { email: input.email }
-  });
-
-  if (!user) {
-    throw new AppError("Invalid credentials", 401);
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt
+      }
+    };
   }
 
-  const isPasswordValid = await bcrypt.compare(input.password, user.password);
+  public async loginUser(input: LoginInput) {
+    const user = await this.userRepository.findByEmail(input.email);
 
-  if (!isPasswordValid) {
-    throw new AppError("Invalid credentials", 401);
-  }
-
-  const token = signToken({
-    userId: user.id,
-    email: user.email
-  });
-
-  return {
-    token,
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      createdAt: user.createdAt
+    if (!user) {
+      throw new AppError("Invalid credentials", 401);
     }
-  };
+
+    const isPasswordValid = await bcrypt.compare(input.password, user.password);
+
+    if (!isPasswordValid) {
+      throw new AppError("Invalid credentials", 401);
+    }
+
+    const token = signToken({
+      userId: user.id,
+      email: user.email
+    });
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        createdAt: user.createdAt
+      }
+    };
+  }
 }
