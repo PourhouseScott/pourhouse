@@ -48,7 +48,7 @@ Models:
 
 | Model | Description |
 |---|---|
-| `Wine` | Core wine record; unique on `(name, wineryId, vintage)` |
+| `Wine` | Core wine record; unique on `(name, wineryId, vintage)`. Has a unique `slug` for URL-safe identification and an optional unique `squareItemId` for Square POS integration. |
 | `Winery` | Wine producer; belongs to a `Region` |
 | `Region` | Hierarchical geographic region (self-referencing) |
 | `Inventory` | Per-wine stock, pricing, and availability |

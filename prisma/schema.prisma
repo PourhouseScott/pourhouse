@@ -10,6 +10,7 @@ datasource db {
 model Wine {
   id             String      @id @default(uuid())
   name           String
+  slug           String      @unique
   vintage        Int
   wineryId       String
   regionId       String
@@ -18,6 +19,7 @@ model Wine {
   alcoholPercent Float
   description    String
   imageUrl       String
+  squareItemId   String?     @unique
   createdAt      DateTime    @default(now())
 
   winery    Winery      @relation(fields: [wineryId], references: [id], onDelete: Restrict)

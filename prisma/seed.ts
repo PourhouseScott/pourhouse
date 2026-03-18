@@ -72,6 +72,7 @@ async function main() {
     update: {},
     create: {
       name: "Reserve Cabernet",
+      slug: "reserve-cabernet-silver-crest-cellars-2020",
       vintage: 2020,
       wineryId: wineryTwo.id,
       regionId: napa.id,
@@ -94,6 +95,7 @@ async function main() {
     update: {},
     create: {
       name: "Grand Bordeaux Blend",
+      slug: "grand-bordeaux-blend-chateau-lumiere-2019",
       vintage: 2019,
       wineryId: wineryOne.id,
       regionId: bordeaux.id,
