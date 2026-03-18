@@ -13,6 +13,7 @@
     "test:coverage": "vitest run --coverage --passWithNoTests",
     "start": "node dist/server.js",
     "square:fetch": "tsx -r tsconfig-paths/register scripts/fetchSquareCatalog.ts",
+    "square:sync:wines": "tsx -r tsconfig-paths/register scripts/syncSquareCatalogToWines.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",
