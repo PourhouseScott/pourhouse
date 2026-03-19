@@ -136,6 +136,67 @@ describe("WineService", () => {
     ]);
   });
 
+  it("returns null pricing when a wine has no available inventory rows", async () => {
+    const { service, wineRepository } = createService();
+    const wines: WineWithInventory[] = [
+      {
+        id: "w2",
+        slug: "riesling-2021",
+        name: "Riesling",
+        vintage: 2021,
+        wineryId: "winery-2",
+        regionId: "region-2",
+        country: "DE",
+        grapeVarieties: ["Riesling"],
+        alcoholPercent: 11.5,
+        description: "Bright",
+        imageUrl: "https://example.com/riesling.png",
+        squareItemId: null,
+        createdAt: new Date("2026-03-19T00:00:00.000Z"),
+        winery: {
+          id: "winery-2",
+          name: "Mosel Cellars",
+          regionId: "region-2",
+          country: "DE",
+          website: "https://example.com/mosel",
+          description: "Steep slope producer"
+        },
+        region: {
+          id: "region-2",
+          name: "Mosel",
+          parentId: null
+        },
+        inventory: []
+      }
+    ];
+
+    vi.mocked(wineRepository.findMany).mockResolvedValue(wines);
+
+    await expect(service.getWines()).resolves.toEqual([
+      {
+        id: "w2",
+        slug: "riesling-2021",
+        name: "Riesling",
+        vintage: 2021,
+        country: "DE",
+        description: "Bright",
+        imageUrl: "https://example.com/riesling.png",
+        winery: {
+          id: "winery-2",
+          name: "Mosel Cellars"
+        },
+        region: {
+          id: "region-2",
+          name: "Mosel"
+        },
+        pricing: {
+          glass: null,
+          bottle: null
+        }
+      }
+    ]);
+  });
+
   it("throws when wine by id is missing", async () => {
     const { service, wineRepository } = createService();
 
