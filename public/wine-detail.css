@@ -1,0 +1,150 @@
+:root {
+  --paper: #f4efe6;
+  --ink: #1f1f1c;
+  --ink-soft: #4a4a46;
+  --accent: #8b3326;
+  --accent-soft: rgba(139, 51, 38, 0.16);
+  --card: rgba(255, 255, 255, 0.85);
+  --line: rgba(31, 31, 28, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Public Sans", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 20% 0%, #f7ddc5 0%, transparent 48%),
+    radial-gradient(circle at 80% 100%, #dec3a4 0%, transparent 50%),
+    linear-gradient(165deg, #ece6da 0%, #efe6d6 48%, #dfd0b7 100%);
+}
+
+.page-backdrop {
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.1) 18px,
+    rgba(255, 255, 255, 0) 18px,
+    rgba(255, 255, 255, 0) 42px
+  );
+  pointer-events: none;
+}
+
+.layout {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.card {
+  width: min(720px, 100%);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+  padding: 28px;
+  animation: fadeUp 320ms ease-out;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+h1 {
+  margin: 10px 0 12px;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.03;
+}
+
+.description {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.55;
+  font-size: 1.02rem;
+}
+
+.meta {
+  margin-top: 24px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.meta-item {
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.meta-label {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.meta-value {
+  margin: 6px 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.meta-value--price {
+  color: var(--accent);
+}
+
+.card--error {
+  border-color: rgba(139, 51, 38, 0.28);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(254, 235, 232, 0.9));
+}
+
+.tip {
+  margin: 14px 0 0;
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .layout {
+    padding: 14px;
+  }
+
+  .card {
+    border-radius: 18px;
+    padding: 20px;
+  }
+
+  .meta {
+    grid-template-columns: 1fr;
+  }
+}

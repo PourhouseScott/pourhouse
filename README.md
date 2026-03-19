@@ -247,6 +247,10 @@ Generated slugs are based on `name` + `vintage` and receive a numeric suffix whe
 
 - `POST /api/ratings` (requires JWT)
 
+### Frontend Page
+
+- `GET /wines/:slug` - mobile-friendly wine detail page that loads data from `GET /api/wines/:slug` and displays name, description, and pricing
+
 ## Business Rules Implemented
 
 - Duplicate wines prevented by composite unique constraint on `(name, wineryId, vintage)`.
