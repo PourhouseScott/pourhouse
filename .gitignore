@@ -4,3 +4,4 @@ dist
 coverage
 *.log
 .prisma
+sample_data
