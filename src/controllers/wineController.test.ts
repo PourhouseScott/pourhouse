@@ -15,6 +15,44 @@ function createResponse() {
   return res;
 }
 
+function createWineWithRelations() {
+  return {
+    id: "w1",
+    slug: "cabernet-2020",
+    name: "Cabernet",
+    vintage: 2020,
+    wineryId: "winery-1",
+    regionId: "region-1",
+    country: "US",
+    grapeVarieties: ["Cabernet Sauvignon"],
+    alcoholPercent: 13.5,
+    description: "Bold",
+    imageUrl: "https://example.com/wine.png",
+    squareItemId: null,
+    createdAt: new Date("2026-03-19T00:00:00.000Z"),
+    winery: {
+      id: "winery-1",
+      name: "Alpha Winery",
+      regionId: "region-1",
+      country: "US",
+      website: "https://example.com",
+      description: "Estate producer"
+    },
+    region: {
+      id: "region-1",
+      name: "Napa Valley",
+      parentId: null
+    }
+  };
+}
+
+function createWineWithInventory() {
+  return {
+    ...createWineWithRelations(),
+    inventory: []
+  };
+}
+
 describe("WineController", () => {
   it("listWines returns 200", async () => {
     const wineService = {
@@ -89,7 +127,7 @@ describe("WineController", () => {
       getWineRatings: vi.fn()
     } as unknown as WineService;
 
-    vi.mocked(wineService.getWineById).mockResolvedValue({ id: "w1" });
+    vi.mocked(wineService.getWineById).mockResolvedValue(createWineWithInventory());
 
     const controller = new WineController(wineService);
     const req = { params: { id: "w1" } } as unknown as Request;
@@ -110,7 +148,7 @@ describe("WineController", () => {
       getWineRatings: vi.fn()
     } as unknown as WineService;
 
-    vi.mocked(wineService.createWine).mockResolvedValue({ id: "w1" });
+    vi.mocked(wineService.createWine).mockResolvedValue(createWineWithRelations());
 
     const controller = new WineController(wineService);
     const req = { body: { name: "Cab" } } as Request;
@@ -131,7 +169,7 @@ describe("WineController", () => {
       getWineRatings: vi.fn()
     } as unknown as WineService;
 
-    vi.mocked(wineService.searchWines).mockResolvedValue([{ id: "w1" }]);
+    vi.mocked(wineService.searchWines).mockResolvedValue([createWineWithRelations()]);
 
     const controller = new WineController(wineService);
     const req = { query: { q: "cab" } } as unknown as Request;
