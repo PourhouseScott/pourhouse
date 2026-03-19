@@ -75,11 +75,25 @@ API runs at `http://localhost:4000` by default.
 ## Scripts
 
 - `npm run dev` - run API in development with auto-reload
+- `npm run dev:full` - start Postgres and run the API in development
 - `npm run build` - compile TypeScript to `dist`
+- `npm run lint` - run ESLint across the project
+- `npm run format` - format the project with Prettier
+- `npm run test` - run the Vitest suite once
+- `npm run test:watch` - run Vitest in watch mode
+- `npm run test:coverage` - run Vitest with 100% coverage thresholds enabled
 - `npm run start` - run compiled server
+- `npm run square:fetch` - fetch catalog data from Square
+- `npm run square:sync:wines` - sync Square catalog wines into the database
 - `npm run prisma:generate` - generate Prisma client
 - `npm run prisma:migrate` - run migrations in development
 - `npm run prisma:seed` - seed sample data
+- `npm run db:up` - start the local Postgres container
+- `npm run db:down` - stop the local Postgres container
+- `npm run db:status` - inspect the local Postgres container
+- `npm run db:logs` - tail Postgres container logs
+- `npm run db:reset` - destroy the local Postgres data volume
+- `npm run db:setup` - start Postgres, run migrations, and seed data
 
 ## Environment Variables
 
@@ -90,6 +104,8 @@ Use `.env.example` as a template:
 - `DATABASE_URL`
 - `JWT_SECRET`
 - `JWT_EXPIRES_IN`
+- `SQUARE_ACCESS_TOKEN`
+- `SQUARE_ENVIRONMENT`
 
 ## API Endpoints
 
@@ -100,11 +116,37 @@ Use `.env.example` as a template:
 
 ### Wines
 
-- `GET /api/wines`
+- `GET /api/wines` - returns wines with at least one available inventory row, including winery, region, and summarized `pricing.glass` / `pricing.bottle` values
 - `GET /api/wines/:id`
 - `POST /api/wines`
 - `GET /api/wines/search?q=term`
 - `GET /api/wines/:id/ratings`
+
+Example `GET /api/wines` response item:
+
+```json
+{
+  "id": "wine-id",
+  "slug": "cabernet-2020",
+  "name": "Cabernet",
+  "vintage": 2020,
+  "country": "US",
+  "description": "Bold",
+  "imageUrl": "https://example.com/wine.png",
+  "winery": {
+    "id": "winery-1",
+    "name": "Alpha Winery"
+  },
+  "region": {
+    "id": "region-1",
+    "name": "Napa Valley"
+  },
+  "pricing": {
+    "glass": 16,
+    "bottle": 68
+  }
+}
+```
 
 ### Inventory
 
@@ -123,6 +165,8 @@ Use `.env.example` as a template:
 - Ratings constrained to 1-5 by validation and service guard.
 - Only authenticated users can create ratings.
 - Inventory references wines by foreign key (`wineId`) and does not duplicate wine records.
+- Public wine list responses include only wines with available inventory.
+- Public wine list pricing is summarized from available inventory rows using the lowest available glass and bottle prices.
 
 ## Seed Data
 

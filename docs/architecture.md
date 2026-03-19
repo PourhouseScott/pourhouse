@@ -89,6 +89,6 @@ prisma/
 
 - **Unit tests** are co-located with source files as `*.test.ts`.
 - Services are tested by injecting mock repository implementations.
-- Controllers are tested via `supertest` with mock service implementations.
+- Controllers are tested as unit tests with mocked service implementations.
 - No `vi.mock()` calls — all test isolation is achieved through constructor injection.
 - Coverage target is 100% lines, branches, statements, and functions.
