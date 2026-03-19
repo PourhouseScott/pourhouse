@@ -11,8 +11,8 @@ export class WineController {
   };
 
   public getWine = async (req: Request, res: Response) => {
-    const wineId = req.params.id as string;
-    const wine = await this.wineService.getWineById(wineId);
+    const wineSlug = req.params.slug as string;
+    const wine = await this.wineService.getWineBySlug(wineSlug);
     res.status(200).json(wine);
   };
 

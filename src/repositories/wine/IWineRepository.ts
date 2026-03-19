@@ -21,6 +21,7 @@ export type WineListFilters = {
 export interface IWineRepository {
   findMany(filters: WineListFilters): Promise<WineWithInventory[]>;
   findByIdWithInventory(id: string): Promise<WineWithInventory | null>;
+  findBySlugWithInventory(slug: string): Promise<WineWithInventory | null>;
   findByUniqueNameWineryVintage(input: {
     name: string;
     wineryId: string;

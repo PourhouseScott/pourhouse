@@ -90,8 +90,8 @@ export class WineService {
     };
   }
 
-  public async getWineById(id: string) {
-    const wine = await this.wineRepository.findByIdWithInventory(id);
+  public async getWineBySlug(slug: string) {
+    const wine = await this.wineRepository.findBySlugWithInventory(slug);
 
     if (!wine) {
       throw new AppError("Wine not found", 404);

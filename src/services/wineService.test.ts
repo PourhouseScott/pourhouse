@@ -11,6 +11,7 @@ function createService() {
   const wineRepository: IWineRepository = {
     findMany: vi.fn(),
     findByIdWithInventory: vi.fn(),
+    findBySlugWithInventory: vi.fn(),
     findByUniqueNameWineryVintage: vi.fn(),
     create: vi.fn(),
     search: vi.fn()
@@ -569,21 +570,21 @@ describe("WineService", () => {
     ).toBeGreaterThan(0);
   });
 
-  it("throws when wine by id is missing", async () => {
+  it("throws when wine by slug is missing", async () => {
     const { service, wineRepository } = createService();
 
-    vi.mocked(wineRepository.findByIdWithInventory).mockResolvedValue(null);
+    vi.mocked(wineRepository.findBySlugWithInventory).mockResolvedValue(null);
 
-    await expect(service.getWineById("missing")).rejects.toEqual(new AppError("Wine not found", 404));
+    await expect(service.getWineBySlug("missing-slug")).rejects.toEqual(new AppError("Wine not found", 404));
   });
 
-  it("returns wine by id when present", async () => {
+  it("returns wine by slug when present", async () => {
     const { service, wineRepository } = createService();
     const wine = createWineWithInventory();
 
-    vi.mocked(wineRepository.findByIdWithInventory).mockResolvedValue(wine);
+    vi.mocked(wineRepository.findBySlugWithInventory).mockResolvedValue(wine);
 
-    await expect(service.getWineById("wine-1")).resolves.toEqual(wine);
+    await expect(service.getWineBySlug("cabernet-2020")).resolves.toEqual(wine);
   });
 
   it("creates wine when winery/region exist and duplicate does not", async () => {

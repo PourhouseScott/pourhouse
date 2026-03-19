@@ -13,6 +13,7 @@ function createService() {
   const wineRepository: IWineRepository = {
     findMany: vi.fn(),
     findByIdWithInventory: vi.fn(),
+    findBySlugWithInventory: vi.fn(),
     findByUniqueNameWineryVintage: vi.fn(),
     create: vi.fn(),
     search: vi.fn()

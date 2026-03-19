@@ -58,7 +58,7 @@ describe("WineController", () => {
   it("listWines returns 200", async () => {
     const wineService = {
       getWines: vi.fn(),
-      getWineById: vi.fn(),
+      getWineBySlug: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -144,28 +144,28 @@ describe("WineController", () => {
   it("getWine returns 200", async () => {
     const wineService = {
       getWines: vi.fn(),
-      getWineById: vi.fn(),
+      getWineBySlug: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
     } as unknown as WineService;
 
-    vi.mocked(wineService.getWineById).mockResolvedValue(createWineWithInventory());
+    vi.mocked(wineService.getWineBySlug).mockResolvedValue(createWineWithInventory());
 
     const controller = new WineController(wineService);
-    const req = { params: { id: "w1" } } as unknown as Request;
+    const req = { params: { slug: "cabernet-2020" } } as unknown as Request;
     const res = createResponse();
 
     await controller.getWine(req, res);
 
-    expect(wineService.getWineById).toHaveBeenCalledWith("w1");
+    expect(wineService.getWineBySlug).toHaveBeenCalledWith("cabernet-2020");
     expect(res.status).toHaveBeenCalledWith(200);
   });
 
   it("addWine returns 201", async () => {
     const wineService = {
       getWines: vi.fn(),
-      getWineById: vi.fn(),
+      getWineBySlug: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -186,7 +186,7 @@ describe("WineController", () => {
   it("searchWine returns 200", async () => {
     const wineService = {
       getWines: vi.fn(),
-      getWineById: vi.fn(),
+      getWineBySlug: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -207,7 +207,7 @@ describe("WineController", () => {
   it("listWineRatings returns 200", async () => {
     const wineService = {
       getWines: vi.fn(),
-      getWineById: vi.fn(),
+      getWineBySlug: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()

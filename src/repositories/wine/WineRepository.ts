@@ -31,6 +31,17 @@ export class WineRepository implements IWineRepository {
     });
   }
 
+  public async findBySlugWithInventory(slug: string) {
+    return this.prisma.wine.findUnique({
+      where: { slug },
+      include: {
+        winery: true,
+        region: true,
+        inventory: true
+      }
+    });
+  }
+
   public async findByUniqueNameWineryVintage(input: {
     name: string;
     wineryId: string;

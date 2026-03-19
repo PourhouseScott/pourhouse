@@ -117,7 +117,7 @@ Use `.env.example` as a template:
 ### Wines
 
 - `GET /api/wines` - returns a paginated wine list with optional filters and summarized `pricing.glass` / `pricing.bottle` values
-- `GET /api/wines/:id`
+- `GET /api/wines/:slug`
 - `POST /api/wines`
 - `GET /api/wines/search?q=term`
 - `GET /api/wines/:id/ratings`

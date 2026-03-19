@@ -117,6 +117,28 @@ describe("WineRepository", () => {
     });
   });
 
+  it("findBySlugWithInventory requests winery, region, and inventory", async () => {
+    const findUnique = vi.fn().mockResolvedValue(null);
+    const prisma = {
+      wine: {
+        findUnique
+      }
+    } as never;
+
+    const repository = new WineRepository(prisma);
+
+    await repository.findBySlugWithInventory("cabernet-2020");
+
+    expect(findUnique).toHaveBeenCalledWith({
+      where: { slug: "cabernet-2020" },
+      include: {
+        winery: true,
+        region: true,
+        inventory: true
+      }
+    });
+  });
+
   it("findByUniqueNameWineryVintage queries the compound unique key", async () => {
     const findUnique = vi.fn().mockResolvedValue(null);
     const prisma = {
