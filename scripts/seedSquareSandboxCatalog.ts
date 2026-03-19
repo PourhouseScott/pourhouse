@@ -1,6 +1,9 @@
 import "dotenv/config";
+import fs from "node:fs";
+import path from "node:path";
 import { randomUUID } from "node:crypto";
 import { SquareClient, SquareEnvironment } from "square";
+import XLSX from "xlsx";
 import { createSquareCatalogClient } from "../src/integrations/square/squareCatalogClient";
 import { SquareCatalogService } from "../src/integrations/square/squareCatalogService";
 import { env } from "../src/config/env";
@@ -99,8 +102,124 @@ const SAMPLE_CATALOG_ITEMS: SampleCatalogItem[] = [
   }
 ];
 
+const SAMPLE_DATA_DIR = path.resolve(process.cwd(), "sample_data");
+
+type ExportRow = {
+  "Item Name"?: unknown;
+  "Variation Name"?: unknown;
+  Description?: unknown;
+  Price?: unknown;
+  Archived?: unknown;
+};
+
+function normalizeString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function parsePriceCents(value: unknown): number {
+  const numericValue = typeof value === "number" ? value : Number.parseFloat(String(value ?? ""));
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    return 0;
+  }
+
+  return Math.round(numericValue * 100);
+}
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function loadCatalogItemsFromExport(): SampleCatalogItem[] {
+  if (!fs.existsSync(SAMPLE_DATA_DIR)) {
+    return [];
+  }
+
+  const workbookFile = fs
+    .readdirSync(SAMPLE_DATA_DIR)
+    .filter((name) => name.toLowerCase().endsWith(".xlsx"))
+    .sort((left, right) => right.localeCompare(left))[0];
+
+  if (!workbookFile) {
+    return [];
+  }
+
+  const workbookPath = path.join(SAMPLE_DATA_DIR, workbookFile);
+  const workbook = XLSX.readFile(workbookPath, { dense: true });
+  const sheetName = workbook.SheetNames.includes("Items") ? "Items" : workbook.SheetNames[0];
+
+  if (!sheetName) {
+    return [];
+  }
+
+  const sheet = workbook.Sheets[sheetName];
+  if (!sheet) {
+    return [];
+  }
+
+  const rows = XLSX.utils.sheet_to_json<ExportRow>(sheet, {
+    range: 1,
+    defval: ""
+  });
+  const grouped = new Map<string, SampleCatalogItem>();
+
+  for (const row of rows) {
+    const itemName = normalizeString(row["Item Name"]);
+    const variationName = normalizeString(row["Variation Name"]);
+    const description = normalizeString(row.Description);
+    const archived = normalizeString(row.Archived).toUpperCase();
+    const priceCents = parsePriceCents(row.Price);
+
+    if (!itemName || !variationName || priceCents <= 0 || archived === "Y") {
+      continue;
+    }
+
+    const key = itemName.toLowerCase();
+    const existing = grouped.get(key) ?? {
+      name: itemName,
+      description,
+      variations: []
+    };
+
+    if (!existing.description && description) {
+      existing.description = description;
+    }
+
+    const duplicateVariation = existing.variations.some(
+      (variation) => variation.name.toLowerCase() === variationName.toLowerCase()
+    );
+
+    if (!duplicateVariation) {
+      existing.variations.push({
+        name: variationName,
+        priceCents
+      });
+    }
+
+    grouped.set(key, existing);
+  }
+
+  return [...grouped.values()].filter((item) => item.variations.length > 0);
+}
+
+function chunkArray<T>(values: T[], chunkSize: number): T[][] {
+  const chunks: T[][] = [];
+
+  for (let index = 0; index < values.length; index += chunkSize) {
+    chunks.push(values.slice(index, index + chunkSize));
+  }
+
+  return chunks;
+}
+
 function toCatalogObject(item: SampleCatalogItem, index: number, currency: string): Record<string, unknown> {
-  const safeId = `sample-${index + 1}`;
+  const baseId = slugify(item.name) || `sample-${index + 1}`;
+  const safeId = `${baseId}-${index + 1}`;
 
   return {
     type: "ITEM",
@@ -156,6 +275,14 @@ async function main() {
   const catalogClient = createSquareCatalogClient();
   const catalogService = new SquareCatalogService(catalogClient);
   const merchantCurrency = await resolveMerchantCurrency();
+  const exportedCatalogItems = loadCatalogItemsFromExport();
+  const sourceItems = exportedCatalogItems.length > 0 ? exportedCatalogItems : SAMPLE_CATALOG_ITEMS;
+
+  if (exportedCatalogItems.length > 0) {
+    console.log(`Loaded ${exportedCatalogItems.length} catalog items from sample_data export.`);
+  } else {
+    console.log("No readable sample_data export found. Falling back to bundled sample fixtures.");
+  }
 
   console.log("Loading existing Square catalog items...");
   const existingObjects = await catalogService.fetchCatalogItems();
@@ -173,7 +300,7 @@ async function main() {
       .filter((name: string) => name.length > 0)
   );
 
-  const missingItems = SAMPLE_CATALOG_ITEMS.filter(
+  const missingItems = sourceItems.filter(
     (item) => !existingItemNames.has(item.name.trim().toLowerCase())
   );
 
@@ -185,10 +312,11 @@ async function main() {
   console.log(`Creating ${missingItems.length} sample Square catalog items...`);
 
   const objects = missingItems.map((item, index) => toCatalogObject(item, index, merchantCurrency));
+  const objectBatches = chunkArray(objects, 900).map((batchObjects) => ({ objects: batchObjects }));
 
   await catalogClient.batchUpsert({
     idempotencyKey: randomUUID(),
-    batches: [{ objects }]
+    batches: objectBatches
   } as never);
 
   console.log(

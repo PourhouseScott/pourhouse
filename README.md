@@ -125,6 +125,8 @@ This runs three steps in order:
 2. `npm run square:seed:sandbox`
 3. `npm run square:sync:wines`
 
+When `sample_data/*.xlsx` exists, `npm run square:seed:sandbox` reads the newest workbook and seeds catalog items from the `Items` sheet. If no workbook is found, it falls back to bundled sample fixtures.
+
 You can also run individual steps as needed.
 
 ## API Endpoints
