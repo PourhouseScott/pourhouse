@@ -84,7 +84,9 @@ API runs at `http://localhost:4000` by default.
 - `npm run test:coverage` - run Vitest with 100% coverage thresholds enabled
 - `npm run start` - run compiled server
 - `npm run square:fetch` - fetch catalog data from Square
+- `npm run square:seed:sandbox` - seed sample catalog items into Square sandbox (safe-guarded to sandbox env)
 - `npm run square:sync:wines` - sync Square catalog wines into the database
+- `npm run seed:sample:data` - seed local DB, seed Square sandbox catalog, then sync Square data into local wines
 - `npm run prisma:generate` - generate Prisma client
 - `npm run prisma:migrate` - run migrations in development
 - `npm run prisma:seed` - seed sample data
@@ -106,6 +108,24 @@ Use `.env.example` as a template:
 - `JWT_EXPIRES_IN`
 - `SQUARE_ACCESS_TOKEN`
 - `SQUARE_ENVIRONMENT`
+
+For sample-data seeding workflows, set `SQUARE_ENVIRONMENT=sandbox` and use a Square sandbox access token.
+
+## Sample Data Seeding
+
+Use the combined command when you want realistic demo data in both Square sandbox and your local database:
+
+```bash
+npm run seed:sample:data
+```
+
+This runs three steps in order:
+
+1. `npm run prisma:seed`
+2. `npm run square:seed:sandbox`
+3. `npm run square:sync:wines`
+
+You can also run individual steps as needed.
 
 ## API Endpoints
 
