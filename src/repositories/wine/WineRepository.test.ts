@@ -12,7 +12,7 @@ describe("WineRepository", () => {
 
     const repository = new WineRepository(prisma);
 
-  await repository.findMany({});
+    await repository.findMany({});
 
     expect(findMany).toHaveBeenCalledWith({
       where: {
