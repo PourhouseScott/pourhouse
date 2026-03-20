@@ -141,6 +141,7 @@ You can also run individual steps as needed.
 - `GET /api/wines` - returns a paginated wine list with optional filters and summarized `pricing.glass` / `pricing.bottle` values
 - `GET /api/wines/grouped` - returns wines grouped by inferred type, then by region
 - `GET /api/wines/:slug`
+- `GET /api/wines/qr/:code` - resolves a QR code token (slug or Square item id) and redirects to `/wines/:slug`
 - `POST /api/wines` - creates a wine and generates its slug from `name` + `vintage`
 - `GET /api/wines/search?q=term`
 - `GET /api/wines/:id/ratings`

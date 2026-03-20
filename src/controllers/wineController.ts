@@ -21,6 +21,12 @@ export class WineController {
     res.status(200).json(wine);
   };
 
+  public redirectFromQrCode = async (req: Request, res: Response) => {
+    const code = req.params.code as string;
+    const wineSlug = await this.wineService.resolveWineSlugFromQrCode(code);
+    res.redirect(302, `/wines/${encodeURIComponent(wineSlug)}`);
+  };
+
   public addWine = async (req: Request, res: Response) => {
     const wine = await this.wineService.createWine(req.body);
     res.status(201).json(wine);

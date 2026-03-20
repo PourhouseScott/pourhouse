@@ -9,6 +9,7 @@ const router = Router();
 router.get("/", validateRequest(listWinesSchema, "query"), asyncHandler(wineController.listWines));
 router.get("/grouped", validateRequest(groupedWinesSchema, "query"), asyncHandler(wineController.listGroupedWines));
 router.get("/search", validateRequest(searchWineSchema, "query"), asyncHandler(wineController.searchWine));
+router.get("/qr/:code", asyncHandler(wineController.redirectFromQrCode));
 router.get("/:slug", asyncHandler(wineController.getWine));
 router.post("/", validateRequest(createWineSchema), asyncHandler(wineController.addWine));
 router.get("/:id/ratings", asyncHandler(wineController.listWineRatings));

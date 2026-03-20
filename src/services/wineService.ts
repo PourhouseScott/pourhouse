@@ -161,6 +161,24 @@ export class WineService {
     return wine;
   }
 
+  public async resolveWineSlugFromQrCode(code: string) {
+    const trimmedCode = code.trim();
+
+    const wineBySlug = await this.wineRepository.findBySlug(trimmedCode);
+
+    if (wineBySlug) {
+      return wineBySlug.slug;
+    }
+
+    const wineBySquareItemId = await this.wineRepository.findBySquareItemId(trimmedCode);
+
+    if (wineBySquareItemId) {
+      return wineBySquareItemId.slug;
+    }
+
+    throw new AppError("Wine not found", 404);
+  }
+
   public async createWine(input: CreateWineInput) {
     const winery = await this.wineryRepository.findById(input.wineryId);
     const region = await this.regionRepository.findById(input.regionId);

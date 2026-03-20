@@ -16,6 +16,7 @@ function createService() {
   const wineRepository: IWineRepository = {
     findMany: vi.fn(),
     findBySlug: vi.fn(),
+    findBySquareItemId: vi.fn(),
     findByIdWithInventory: vi.fn(),
     findBySlugWithInventory: vi.fn(),
     findByUniqueNameWineryVintage: vi.fn(),
@@ -831,6 +832,33 @@ describe("WineService", () => {
     vi.mocked(wineRepository.findBySlugWithInventory).mockResolvedValue(wine);
 
     await expect(service.getWineBySlug("cabernet-2020")).resolves.toEqual(wine);
+  });
+
+  it("resolves QR code by slug when a slug match exists", async () => {
+    const { service, wineRepository } = createService();
+
+    vi.mocked(wineRepository.findBySlug).mockResolvedValue({ slug: "cabernet-2020" } as never);
+
+    await expect(service.resolveWineSlugFromQrCode("cabernet-2020")).resolves.toBe("cabernet-2020");
+    expect(wineRepository.findBySquareItemId).not.toHaveBeenCalled();
+  });
+
+  it("resolves QR code by square item id when slug does not match", async () => {
+    const { service, wineRepository } = createService();
+
+    vi.mocked(wineRepository.findBySlug).mockResolvedValue(null);
+    vi.mocked(wineRepository.findBySquareItemId).mockResolvedValue({ slug: "terroso-sauvignon-blanc-2022" } as never);
+
+    await expect(service.resolveWineSlugFromQrCode("DMVG33OSRXJXM2DOH2WRQUJ4")).resolves.toBe("terroso-sauvignon-blanc-2022");
+  });
+
+  it("throws when QR code does not map to a wine", async () => {
+    const { service, wineRepository } = createService();
+
+    vi.mocked(wineRepository.findBySlug).mockResolvedValue(null);
+    vi.mocked(wineRepository.findBySquareItemId).mockResolvedValue(null);
+
+    await expect(service.resolveWineSlugFromQrCode("unknown-code")).rejects.toEqual(new AppError("Wine not found", 404));
   });
 
   it("creates wine when winery/region exist and duplicate does not", async () => {

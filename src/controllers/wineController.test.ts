@@ -7,11 +7,13 @@ import type { WineService } from "@/services/wineService";
 function createResponse() {
   const res = {
     status: vi.fn(),
-    json: vi.fn()
+    json: vi.fn(),
+    redirect: vi.fn()
   } as unknown as Response;
 
   vi.mocked(res.status).mockReturnValue(res);
   vi.mocked(res.json).mockReturnValue(res);
+  vi.mocked(res.redirect).mockReturnValue(res);
 
   return res;
 }
@@ -60,6 +62,7 @@ describe("WineController", () => {
       getWines: vi.fn(),
       getGroupedWines: vi.fn(),
       getWineBySlug: vi.fn(),
+      resolveWineSlugFromQrCode: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -147,6 +150,7 @@ describe("WineController", () => {
       getWines: vi.fn(),
       getGroupedWines: vi.fn(),
       getWineBySlug: vi.fn(),
+      resolveWineSlugFromQrCode: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -169,6 +173,7 @@ describe("WineController", () => {
       getWines: vi.fn(),
       getGroupedWines: vi.fn(),
       getWineBySlug: vi.fn(),
+      resolveWineSlugFromQrCode: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -191,6 +196,7 @@ describe("WineController", () => {
       getWines: vi.fn(),
       getGroupedWines: vi.fn(),
       getWineBySlug: vi.fn(),
+      resolveWineSlugFromQrCode: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -213,6 +219,7 @@ describe("WineController", () => {
       getWines: vi.fn(),
       getGroupedWines: vi.fn(),
       getWineBySlug: vi.fn(),
+      resolveWineSlugFromQrCode: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -235,6 +242,7 @@ describe("WineController", () => {
       getWines: vi.fn(),
       getGroupedWines: vi.fn(),
       getWineBySlug: vi.fn(),
+      resolveWineSlugFromQrCode: vi.fn(),
       createWine: vi.fn(),
       searchWines: vi.fn(),
       getWineRatings: vi.fn()
@@ -286,5 +294,28 @@ describe("WineController", () => {
 
     expect(wineService.getGroupedWines).toHaveBeenCalledWith(query);
     expect(res.status).toHaveBeenCalledWith(200);
+  });
+
+  it("redirectFromQrCode returns 302 redirect to the frontend wine detail page", async () => {
+    const wineService = {
+      getWines: vi.fn(),
+      getGroupedWines: vi.fn(),
+      getWineBySlug: vi.fn(),
+      resolveWineSlugFromQrCode: vi.fn(),
+      createWine: vi.fn(),
+      searchWines: vi.fn(),
+      getWineRatings: vi.fn()
+    } as unknown as WineService;
+
+    vi.mocked(wineService.resolveWineSlugFromQrCode).mockResolvedValue("cabernet-2020");
+
+    const controller = new WineController(wineService);
+    const req = { params: { code: "DMVG33OSRXJXM2DOH2WRQUJ4" } } as unknown as Request;
+    const res = createResponse();
+
+    await controller.redirectFromQrCode(req, res);
+
+    expect(wineService.resolveWineSlugFromQrCode).toHaveBeenCalledWith("DMVG33OSRXJXM2DOH2WRQUJ4");
+    expect(res.redirect).toHaveBeenCalledWith(302, "/wines/cabernet-2020");
   });
 });

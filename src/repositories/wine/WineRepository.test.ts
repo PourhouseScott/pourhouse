@@ -134,6 +134,23 @@ describe("WineRepository", () => {
     });
   });
 
+  it("findBySquareItemId queries the unique Square item id", async () => {
+    const findUnique = vi.fn().mockResolvedValue(null);
+    const prisma = {
+      wine: {
+        findUnique
+      }
+    } as never;
+
+    const repository = new WineRepository(prisma);
+
+    await repository.findBySquareItemId("square-item-1");
+
+    expect(findUnique).toHaveBeenCalledWith({
+      where: { squareItemId: "square-item-1" }
+    });
+  });
+
   it("findBySlugWithInventory requests winery, region, and inventory", async () => {
     const findUnique = vi.fn().mockResolvedValue(null);
     const prisma = {
