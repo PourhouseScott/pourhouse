@@ -22,14 +22,14 @@ CREATE INDEX "WineVariation_squareVariationId_idx" ON "public"."WineVariation"("
 -- Create a unique variation for each Inventory row
 -- This preserves the existing data structure where an Inventory row represents a distinct variation
 INSERT INTO "public"."WineVariation" (id, "wineId", "squareVariationId", "name", "price", "volumeOz", "isPublic", "isDefault", "createdAt")
-SELECT 
+SELECT
     gen_random_uuid(),
     i."wineId",
-    CASE 
+    CASE
         WHEN i."locationId" LIKE 'square:%' THEN substring(i."locationId" FROM 8)
         ELSE NULL
     END as "squareVariationId",
-    CASE 
+    CASE
         WHEN i."priceGlass" > 0 THEN 'By the Glass - $' || i."priceGlass"
         WHEN i."priceBottle" > 0 THEN 'Bottle - $' || i."priceBottle"
         ELSE 'Variation'
@@ -53,7 +53,7 @@ SET "wineVariationId" = (
     WHERE wv."wineId" = i."wineId"
     AND wv."price" = GREATEST(i."priceGlass", i."priceBottle")
     AND (
-        CASE 
+        CASE
             WHEN i."locationId" LIKE 'square:%' THEN substring(i."locationId" FROM 8)
             ELSE NULL
         END IS NOT DISTINCT FROM wv."squareVariationId"
