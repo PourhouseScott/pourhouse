@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createWineSchema, listWinesSchema } from "@/models/validation";
+import { createInventorySchema, createWineSchema, listWinesSchema, updateInventorySchema } from "@/models/validation";
 
 describe("listWinesSchema", () => {
   it("applies defaults and transforms string booleans", () => {
@@ -76,6 +76,38 @@ describe("createWineSchema", () => {
       alcoholPercent: 13.5,
       description: "Bold",
       imageUrl: "https://example.com/wine.png"
+    });
+  });
+});
+
+describe("inventory schemas", () => {
+  it("accepts createInventorySchema with wineVariationId", () => {
+    expect(
+      createInventorySchema.parse({
+        wineVariationId: "11111111-1111-4111-8111-111111111111",
+        locationId: "bar-main",
+        stockQuantity: 10,
+        isAvailable: true,
+        isFeatured: false
+      })
+    ).toEqual({
+      wineVariationId: "11111111-1111-4111-8111-111111111111",
+      locationId: "bar-main",
+      stockQuantity: 10,
+      isAvailable: true,
+      isFeatured: false
+    });
+  });
+
+  it("accepts updateInventorySchema without price fields", () => {
+    expect(
+      updateInventorySchema.parse({
+        stockQuantity: 4,
+        isAvailable: true
+      })
+    ).toEqual({
+      stockQuantity: 4,
+      isAvailable: true
     });
   });
 });

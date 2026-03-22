@@ -66,7 +66,7 @@ describe("InventoryController", () => {
     vi.mocked(inventoryService.createInventory).mockResolvedValue({ id: "i1" });
 
     const controller = new InventoryController(inventoryService);
-    const req = { body: { wineId: "w1" } } as Request;
+    const req = { body: { wineVariationId: "v1" } } as Request;
     const res = createResponse();
 
     await controller.addInventory(req, res);
