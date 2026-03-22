@@ -84,10 +84,15 @@ export class SquareSyncRepository implements ISquareSyncRepository {
         }
       });
       const variationRows = Array.from(variationMap.values());
+      const defaultVariationRow = variationRows.find((row) => row.isDefault);
+      const fallbackDefaultRow = variationRows.find((row) => row.isPublic ?? true) ?? variationRows[0];
+      const selectedDefaultKey =
+        (defaultVariationRow?.squareVariationId || defaultVariationRow?.variationName) ??
+        (fallbackDefaultRow?.squareVariationId || fallbackDefaultRow?.variationName);
 
       // Create variations first
       const variations = await Promise.all(
-        variationRows.map((row, index) =>
+        variationRows.map((row) =>
           tx.wineVariation.create({
             data: {
               wineId,
@@ -95,8 +100,8 @@ export class SquareSyncRepository implements ISquareSyncRepository {
               name: row.variationName,
               price: row.price,
               volumeOz: row.volumeOz ?? null,
-              isPublic: true,
-              isDefault: index === 0
+              isPublic: row.isPublic ?? true,
+              isDefault: (row.squareVariationId || row.variationName) === selectedDefaultKey
             }
           })
         )

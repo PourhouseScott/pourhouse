@@ -5,6 +5,8 @@ export type InventorySyncRow = {
   variationName: string;
   price: number;
   volumeOz?: number;
+  isPublic?: boolean;
+  isDefault?: boolean;
   locationId: string;
   stockQuantity: number;
   isAvailable: boolean;

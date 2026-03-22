@@ -32,6 +32,7 @@ describe("SquareWineSyncService", () => {
             {
               id: "square-var-1",
               itemVariationData: {
+                name: "5oz",
                 priceMoney: {
                   amount: 1500
                 }
@@ -40,6 +41,7 @@ describe("SquareWineSyncService", () => {
             {
               id: "square-var-2",
               itemVariationData: {
+                name: "9oz",
                 priceMoney: {
                   amount: 1800
                 }
@@ -65,8 +67,11 @@ describe("SquareWineSyncService", () => {
     expect(repository.replaceInventoryForWine).toHaveBeenCalledWith("wine-created", [
       {
         squareVariationId: "square-var-1",
-        variationName: "Square Variation square-var-1",
+        variationName: "5oz",
         price: 15,
+        volumeOz: 5,
+        isPublic: true,
+        isDefault: false,
         locationId: "square:square-var-1",
         stockQuantity: 0,
         isAvailable: true,
@@ -74,8 +79,11 @@ describe("SquareWineSyncService", () => {
       },
       {
         squareVariationId: "square-var-2",
-        variationName: "Square Variation square-var-2",
+        variationName: "9oz",
         price: 18,
+        volumeOz: 9,
+        isPublic: true,
+        isDefault: true,
         locationId: "square:square-var-2",
         stockQuantity: 0,
         isAvailable: false,
@@ -122,6 +130,7 @@ describe("SquareWineSyncService", () => {
             {
               id: "dup-var",
               itemVariationData: {
+                name: "8oz",
                 priceMoney: {
                   amount: 1200
                 }
@@ -135,6 +144,7 @@ describe("SquareWineSyncService", () => {
         id: "dup-var",
         itemVariationData: {
           itemId: "square-item-dedupe",
+          name: "8oz",
           priceMoney: {
             amount: 1200
           }
@@ -160,8 +170,11 @@ describe("SquareWineSyncService", () => {
     expect(firstCallRows).toEqual([
       {
         squareVariationId: "dup-var",
-        variationName: "Square Variation dup-var",
+        variationName: "8oz",
         price: 12,
+        volumeOz: 8,
+        isPublic: true,
+        isDefault: false,
         locationId: "square:dup-var",
         stockQuantity: 0,
         isAvailable: true,
@@ -174,6 +187,8 @@ describe("SquareWineSyncService", () => {
         squareVariationId: "square-item-no-variation-default",
         variationName: "Square Variation square-item-no-variation-default",
         price: 0,
+        isPublic: true,
+        isDefault: false,
         locationId: "square:square-item-no-variation-default",
         stockQuantity: 0,
         isAvailable: true,
@@ -294,7 +309,73 @@ describe("SquareWineSyncService", () => {
         squareVariationId: "square-item-punct-variation",
         variationName: "Square Variation square-item-punct-variation",
         price: 0,
+        isPublic: true,
+        isDefault: false,
         locationId: "square:square-item-punct-variation",
+        stockQuantity: 0,
+        isAvailable: true,
+        isFeatured: false
+      }
+    ]);
+  });
+
+  it("marks 2oz variations as private and 9oz as default", async () => {
+    const repository = createSquareSyncRepositoryMock();
+    const service = new SquareWineSyncService(repository);
+
+    const catalogObjects = [
+      {
+        type: "ITEM",
+        id: "square-item-serving-rules",
+        itemData: {
+          name: "Serving Rules Wine",
+          variations: [
+            {
+              id: "var-2oz",
+              itemVariationData: {
+                name: "2oz",
+                priceMoney: {
+                  amount: 900
+                }
+              }
+            },
+            {
+              id: "var-9oz",
+              itemVariationData: {
+                name: "9oz",
+                priceMoney: {
+                  amount: 2500
+                }
+              }
+            }
+          ]
+        }
+      }
+    ] as never[];
+
+    await service.syncCatalogObjects(catalogObjects);
+
+    expect(repository.replaceInventoryForWine).toHaveBeenCalledWith("wine-created", [
+      {
+        squareVariationId: "var-2oz",
+        variationName: "2oz",
+        price: 9,
+        volumeOz: 2,
+        isPublic: false,
+        isDefault: false,
+        locationId: "square:var-2oz",
+        stockQuantity: 0,
+        isAvailable: true,
+        isFeatured: false
+      },
+      {
+        squareVariationId: "var-9oz",
+        variationName: "9oz",
+        price: 25,
+        volumeOz: 9,
+        isPublic: true,
+        isDefault: true,
+        locationId: "square:var-9oz",
         stockQuantity: 0,
         isAvailable: true,
         isFeatured: false

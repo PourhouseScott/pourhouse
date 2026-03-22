@@ -18,6 +18,7 @@ type ParsedSquareItem = {
 
 type ParsedSquareVariation = {
   id: string;
+  name: string;
   priceAmountCents: number;
   isDeleted: boolean;
 };
@@ -99,9 +100,14 @@ export class SquareWineSyncService {
           const variationId = this.readString(variation.id) ?? `${object.id}-variation`;
           const itemVariationData = (variation.itemVariationData ?? {}) as Record<string, unknown>;
           const priceMoney = (itemVariationData.priceMoney ?? {}) as Record<string, unknown>;
+          const variationName =
+            this.readString(itemVariationData.name) ??
+            this.readString(variation.name) ??
+            `Square Variation ${variationId}`;
           const current = variationsByItemId.get(object.id) ?? [];
           current.push({
             id: variationId,
+            name: variationName,
             priceAmountCents: this.readNumber(priceMoney.amount),
             isDeleted: this.readBoolean(variation.isDeleted)
           });
@@ -116,8 +122,12 @@ export class SquareWineSyncService {
         }
 
         const current = variationsByItemId.get(itemId) ?? [];
+        const variationName =
+          this.readString(object.itemVariationData?.name) ??
+          `Square Variation ${object.id ?? `${itemId}-variation`}`;
         current.push({
           id: object.id ?? `${itemId}-variation`,
+          name: variationName,
           priceAmountCents: Number(object.itemVariationData?.priceMoney?.amount ?? 0),
           isDeleted: object.isDeleted ?? false
         });
@@ -170,21 +180,47 @@ export class SquareWineSyncService {
   }
 
   private mapVariationsToInventoryRows(variations: ParsedSquareVariation[], itemId: string): InventorySyncRow[] {
-    const source = variations.length > 0 ? variations : [{ id: `${itemId}-default`, priceAmountCents: 0, isDeleted: false }];
+    const source =
+      variations.length > 0
+        ? variations
+        : [
+          {
+            id: `${itemId}-default`,
+            name: `Square Variation ${itemId}-default`,
+            priceAmountCents: 0,
+            isDeleted: false
+          }
+        ];
 
     return source.map((variation) => {
       const price = variation.priceAmountCents > 0 ? variation.priceAmountCents / 100 : 0;
+      const volumeOz = this.parseVolumeOz(variation.name);
+      const isTwoOz = volumeOz === 2;
+      const isNineOz = volumeOz === 9;
 
       return {
         squareVariationId: variation.id,
-        variationName: `Square Variation ${variation.id}`,
+        variationName: variation.name,
         price,
+        ...(volumeOz !== null ? { volumeOz } : {}),
+        isPublic: !isTwoOz,
+        isDefault: isNineOz,
         locationId: `square:${variation.id}`,
         stockQuantity: 0,
         isAvailable: !variation.isDeleted,
         isFeatured: false
       };
     });
+  }
+
+  private parseVolumeOz(name: string): number | null {
+    const normalized = name.trim().toLowerCase();
+    const match = normalized.match(/(\d+(?:\.\d+)?)\s*oz\b/);
+    if (!match) {
+      return null;
+    }
+
+    return Math.round(Number(match[1]));
   }
 
   private buildSlug(name: string, squareItemId: string): string {
