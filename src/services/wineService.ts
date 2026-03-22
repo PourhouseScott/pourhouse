@@ -2,6 +2,11 @@ import type { IRegionRepository } from "@/repositories/region/IRegionRepository"
 import type { IRatingRepository } from "@/repositories/rating/IRatingRepository";
 import type { IWineRepository, WineListFilters, WineWithInventory } from "@/repositories/wine/IWineRepository";
 import type { IWineryRepository } from "@/repositories/winery/IWineryRepository";
+import {
+  compareWineListItems as compareWineListItemsForDisplay,
+  inferWineType as inferWineTypeForDisplay,
+  toWineListItem as toWineListItemForDisplay
+} from "@/services/winePresentation";
 import { AppError } from "@/utils/appError";
 import { normalizeSlugSegment } from "@/utils/slug";
 
@@ -248,40 +253,7 @@ export class WineService {
   }
 
   private inferWineType(wine: WineWithInventory): WineType {
-    const grapeVarieties = Array.isArray(wine.grapeVarieties)
-      ? wine.grapeVarieties.filter((value): value is string => typeof value === "string")
-      : [];
-    const searchableText = [wine.name, wine.description, ...grapeVarieties].join(" ").toLowerCase();
-
-    if (this.matchesAny(searchableText, ["sparkling", "champagne", "prosecco", "cava"])) {
-      return "sparkling";
-    }
-
-    if (this.matchesAny(searchableText, ["rose", "rosé"])) {
-      return "rose";
-    }
-
-    if (this.matchesAny(searchableText, ["port", "sherry", "madeira"])) {
-      return "fortified";
-    }
-
-    if (this.matchesAny(searchableText, ["sauternes", "ice wine", "late harvest", "tokaji", "dessert"])) {
-      return "dessert";
-    }
-
-    if (this.matchesAny(searchableText, ["chardonnay", "sauvignon blanc", "pinot grigio", "riesling", "chenin", "albarino"])) {
-      return "white";
-    }
-
-    if (this.matchesAny(searchableText, ["cabernet", "merlot", "pinot noir", "syrah", "shiraz", "malbec", "tempranillo", "zinfandel"])) {
-      return "red";
-    }
-
-    return "other";
-  }
-
-  private matchesAny(searchableText: string, candidates: string[]) {
-    return candidates.some((candidate) => searchableText.includes(candidate));
+    return inferWineTypeForDisplay(wine);
   }
 
   private compareWineListItems(
@@ -290,19 +262,7 @@ export class WineService {
     sort: WineListSort,
     order: SortOrder
   ) {
-    if (sort === "createdAt") {
-      return this.compareNumbers(left.wine.createdAt.getTime(), right.wine.createdAt.getTime(), order);
-    }
-
-    if (sort === "name") {
-      return this.compareStrings(left.item.name, right.item.name, order);
-    }
-
-    if (sort === "priceGlass") {
-      return this.compareNullableNumbers(left.item.pricing.glass, right.item.pricing.glass, order);
-    }
-
-    return this.compareNullableNumbers(left.item.pricing.bottle, right.item.pricing.bottle, order);
+    return compareWineListItemsForDisplay(left, right, sort, order);
   }
 
   private compareNumbers(left: number, right: number, order: SortOrder) {
@@ -330,29 +290,6 @@ export class WineService {
   }
 
   private toWineListItem(wine: WineWithInventory): WineListItem {
-    // Extract all unique prices from variations
-    const prices = wine.variations.map((variation) => Number(variation.price));
-
-    return {
-      id: wine.id,
-      slug: wine.slug,
-      name: wine.name,
-      vintage: wine.vintage,
-      country: wine.country,
-      description: wine.description,
-      imageUrl: wine.imageUrl,
-      winery: {
-        id: wine.winery.id,
-        name: wine.winery.name
-      },
-      region: {
-        id: wine.region.id,
-        name: wine.region.name
-      },
-      pricing: {
-        glass: prices.length > 0 ? Math.min(...prices) : null,
-        bottle: prices.length > 0 ? Math.max(...prices) : null
-      }
-    };
+    return toWineListItemForDisplay(wine);
   }
 }
