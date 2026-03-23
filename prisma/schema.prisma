@@ -33,6 +33,7 @@ model Wine {
   winery    Winery           @relation(fields: [wineryId], references: [id], onDelete: Restrict)
   region    Region           @relation(fields: [regionId], references: [id], onDelete: Restrict)
   variations WineVariation[]
+  flightMemberships FlightWine[]
   ratings   Rating[]
   inventory Inventory[]
   squareCatalogItem SquareCatalogItem?
@@ -40,6 +41,33 @@ model Wine {
   @@unique([name, wineryId, vintage])
   @@index([regionId])
   @@index([wineryId])
+}
+
+model Flight {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+
+  wines       FlightWine[]
+
+  @@index([isActive])
+}
+
+model FlightWine {
+  id        String   @id @default(uuid())
+  flightId  String
+  wineId    String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  flight    Flight   @relation(fields: [flightId], references: [id], onDelete: Cascade)
+  wine      Wine     @relation(fields: [wineId], references: [id], onDelete: Cascade)
+
+  @@unique([flightId, wineId])
+  @@index([flightId, position])
+  @@index([wineId])
 }
 
 model WineVariation {

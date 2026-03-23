@@ -53,6 +53,27 @@ export const listWinesSchema = wineListFilterSchema.extend({
 
 export const groupedWinesSchema = wineListFilterSchema;
 
+export const listFlightsQuerySchema = z.object({
+  activeOnly: booleanQuerySchema.optional()
+});
+
+export const createFlightSchema = z.object({
+  name: z.string().trim().min(1),
+  description: z.string().trim().min(1).optional(),
+  isActive: z.boolean().optional()
+});
+
+export const updateFlightSchema = z.object({
+  name: z.string().trim().min(1).optional(),
+  description: z.string().trim().min(1).optional(),
+  isActive: z.boolean().optional()
+});
+
+export const addWineToFlightSchema = z.object({
+  wineId: z.string().uuid(),
+  position: z.number().int().min(0).optional()
+});
+
 export const createInventorySchema = z.object({
   wineId: z.string().uuid(),
   locationId: z.string().min(1),

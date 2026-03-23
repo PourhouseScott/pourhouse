@@ -1,5 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { createInventorySchema, createWineSchema, listWinesSchema, updateInventorySchema } from "@/models/validation";
+import {
+  addWineToFlightSchema,
+  createFlightSchema,
+  createInventorySchema,
+  createWineSchema,
+  listFlightsQuerySchema,
+  listWinesSchema,
+  updateFlightSchema,
+  updateInventorySchema
+} from "@/models/validation";
 
 describe("listWinesSchema", () => {
   it("applies defaults and transforms string booleans", () => {
@@ -108,6 +117,50 @@ describe("inventory schemas", () => {
     ).toEqual({
       sealedBottleCount: 4,
       isAvailable: true
+    });
+  });
+});
+
+describe("flight schemas", () => {
+  it("parses list flights query with boolean string", () => {
+    expect(listFlightsQuerySchema.parse({ activeOnly: "false" })).toEqual({
+      activeOnly: false
+    });
+  });
+
+  it("accepts create flight payload", () => {
+    expect(
+      createFlightSchema.parse({
+        name: "Weekend Flight",
+        description: "Three pours",
+        isActive: true
+      })
+    ).toEqual({
+      name: "Weekend Flight",
+      description: "Three pours",
+      isActive: true
+    });
+  });
+
+  it("accepts update flight payload", () => {
+    expect(
+      updateFlightSchema.parse({
+        isActive: false
+      })
+    ).toEqual({
+      isActive: false
+    });
+  });
+
+  it("accepts add wine to flight payload", () => {
+    expect(
+      addWineToFlightSchema.parse({
+        wineId: "11111111-1111-4111-8111-111111111111",
+        position: 1
+      })
+    ).toEqual({
+      wineId: "11111111-1111-4111-8111-111111111111",
+      position: 1
     });
   });
 });

@@ -1,5 +1,6 @@
 import { Router } from "express";
 import authRoutes from "./authRoutes";
+import flightRoutes from "./flightRoutes";
 import inventoryRoutes from "./inventoryRoutes";
 import ratingRoutes from "./ratingRoutes";
 import wineRoutes from "./wineRoutes";
@@ -14,5 +15,6 @@ router.use("/auth", authRoutes);
 router.use("/wines", wineRoutes);
 router.use("/inventory", inventoryRoutes);
 router.use("/ratings", ratingRoutes);
+router.use("/flights", flightRoutes);
 
 export default router;
