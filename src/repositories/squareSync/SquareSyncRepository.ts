@@ -135,7 +135,7 @@ export class SquareSyncRepository implements ISquareSyncRepository {
       const variationIds = existingVariations.map(v => v.id);
       if (variationIds.length > 0) {
         await tx.inventory.deleteMany({
-          where: { wineVariationId: { in: variationIds } }
+          where: { wineId }
         });
         await tx.wineVariation.deleteMany({
           where: { wineId }
@@ -162,7 +162,7 @@ export class SquareSyncRepository implements ISquareSyncRepository {
         (fallbackDefaultRow?.squareVariationId || fallbackDefaultRow?.variationName);
 
       // Create variations first
-      const variations = await Promise.all(
+      await Promise.all(
         variationRows.map((row) =>
           tx.wineVariation.create({
             data: {
@@ -178,20 +178,28 @@ export class SquareSyncRepository implements ISquareSyncRepository {
         )
       );
 
-      // Create a map of variation keys to IDs for quick lookup
-      const variationIdMap = new Map<string, string>();
-      variations.forEach((variation, index) => {
-        const row = variationRows[index]!;
-        const key = row.squareVariationId || row.variationName;
-        variationIdMap.set(key, variation.id);
+      const inventoryByLocation = new Map<string, InventorySyncRow>();
+      rows.forEach((row) => {
+        const existingRow = inventoryByLocation.get(row.locationId);
+        if (!existingRow) {
+          inventoryByLocation.set(row.locationId, { ...row });
+          return;
+        }
+
+        inventoryByLocation.set(row.locationId, {
+          ...existingRow,
+          sealedBottleCount: Math.max(existingRow.sealedBottleCount, row.sealedBottleCount),
+          isAvailable: existingRow.isAvailable || row.isAvailable,
+          isFeatured: existingRow.isFeatured || row.isFeatured
+        });
       });
 
-      // Create inventory entries
+      // Create sealed-bottle inventory entries at wine level (no open bottle tracking)
       await tx.inventory.createMany({
-        data: rows.map(row => ({
-          wineVariationId: variationIdMap.get(row.squareVariationId || row.variationName)!,
+        data: Array.from(inventoryByLocation.values()).map((row) => ({
+          wineId,
           locationId: row.locationId,
-          stockQuantity: row.stockQuantity,
+          sealedBottleCount: row.sealedBottleCount,
           isAvailable: row.isAvailable,
           isFeatured: row.isFeatured
         }))

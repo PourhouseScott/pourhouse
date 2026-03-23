@@ -54,16 +54,16 @@ export const listWinesSchema = wineListFilterSchema.extend({
 export const groupedWinesSchema = wineListFilterSchema;
 
 export const createInventorySchema = z.object({
-  wineVariationId: z.string().uuid(),
+  wineId: z.string().uuid(),
   locationId: z.string().min(1),
-  stockQuantity: z.number().int().min(0),
+  sealedBottleCount: z.number().int().min(0),
   isAvailable: z.boolean().optional(),
   isFeatured: z.boolean().optional()
 });
 
 export const updateInventorySchema = z.object({
   locationId: z.string().min(1).optional(),
-  stockQuantity: z.number().int().min(0).optional(),
+  sealedBottleCount: z.number().int().min(0).optional(),
   isAvailable: z.boolean().optional(),
   isFeatured: z.boolean().optional()
 });

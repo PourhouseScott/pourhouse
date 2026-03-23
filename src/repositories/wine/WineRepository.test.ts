@@ -25,10 +25,8 @@ describe("WineRepository", () => {
       include: {
         winery: true,
         region: true,
+        inventory: true,
         variations: {
-          include: {
-            inventory: true
-          },
           where: {
             isPublic: true
           }
@@ -65,31 +63,24 @@ describe("WineRepository", () => {
         },
         regionId: "region-1",
         wineryId: "winery-1",
+        inventory: {
+          some: {
+            isFeatured: true
+          }
+        },
         variations: {
           some: {
-            isPublic: true,
-            inventory: {
-              some: {
-                isFeatured: true
-              }
-            }
+            isPublic: true
           }
         }
       },
       include: {
         winery: true,
         region: true,
+        inventory: true,
         variations: {
-          include: {
-            inventory: true
-          },
           where: {
-            isPublic: true,
-            inventory: {
-              some: {
-                isFeatured: true
-              }
-            }
+            isPublic: true
           }
         }
       },
@@ -114,11 +105,8 @@ describe("WineRepository", () => {
       include: {
         winery: true,
         region: true,
-        variations: {
-          include: {
-            inventory: true
-          }
-        }
+        inventory: true,
+        variations: true
       }
     });
   });
@@ -174,11 +162,8 @@ describe("WineRepository", () => {
       include: {
         winery: true,
         region: true,
-        variations: {
-          include: {
-            inventory: true
-          }
-        }
+        inventory: true,
+        variations: true
       }
     });
   });

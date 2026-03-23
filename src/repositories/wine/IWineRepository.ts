@@ -6,8 +6,9 @@ export type WineWithRelations = Wine & {
 };
 
 export type WineWithInventory = WineWithRelations & {
+  inventory?: Inventory[];
   variations: (WineVariation & {
-    inventory: Inventory[];
+    inventory?: Inventory[];
   })[];
 };
 

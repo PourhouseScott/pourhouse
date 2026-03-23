@@ -115,7 +115,7 @@ export class SquareCatalogParser {
         isPublic: !isTwoOz,
         isDefault: isNineOz,
         locationId: `square:${variation.id}`,
-        stockQuantity: 0,
+        sealedBottleCount: 0,
         isAvailable: !variation.isDeleted,
         isFeatured: false
       };

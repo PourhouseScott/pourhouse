@@ -7,14 +7,10 @@ export class InventoryRepository implements IInventoryRepository {
   public async findMany() {
     return this.prisma.inventory.findMany({
       include: {
-        wineVariation: {
+        wine: {
           include: {
-            wine: {
-              include: {
-                winery: true,
-                region: true
-              }
-            }
+            winery: true,
+            region: true
           }
         }
       },
@@ -26,14 +22,10 @@ export class InventoryRepository implements IInventoryRepository {
     return this.prisma.inventory.findUnique({
       where: { id },
       include: {
-        wineVariation: {
+        wine: {
           include: {
-            wine: {
-              include: {
-                winery: true,
-                region: true
-              }
-            }
+            winery: true,
+            region: true
           }
         }
       }
@@ -44,7 +36,7 @@ export class InventoryRepository implements IInventoryRepository {
     return this.prisma.inventory.create({
       data: input,
       include: {
-        wineVariation: true
+        wine: true
       }
     });
   }
@@ -54,7 +46,7 @@ export class InventoryRepository implements IInventoryRepository {
       where: { id },
       data: input,
       include: {
-        wineVariation: true
+        wine: true
       }
     });
   }

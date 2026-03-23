@@ -26,6 +26,7 @@ model Wine {
   region    Region           @relation(fields: [regionId], references: [id], onDelete: Restrict)
   variations WineVariation[]
   ratings   Rating[]
+  inventory Inventory[]
   squareCatalogItem SquareCatalogItem?
 
   @@unique([name, wineryId, vintage])
@@ -45,7 +46,6 @@ model WineVariation {
   createdAt           DateTime  @default(now())
 
   wine      Wine        @relation(fields: [wineId], references: [id], onDelete: Cascade)
-  inventory Inventory[]
   squareCatalogVariation SquareCatalogVariation?
 
   @@index([wineId])
@@ -119,17 +119,17 @@ model Region {
 
 model Inventory {
   id                String   @id @default(uuid())
-  wineVariationId   String
+  wineId            String
   locationId        String
-  stockQuantity     Int
+  sealedBottleCount Int
   isAvailable       Boolean  @default(true)
   isFeatured        Boolean  @default(false)
   createdAt         DateTime @default(now())
 
-  wineVariation WineVariation @relation(fields: [wineVariationId], references: [id], onDelete: Cascade)
+  wine Wine @relation(fields: [wineId], references: [id], onDelete: Cascade)
 
-  @@index([wineVariationId])
-  @@unique([wineVariationId, locationId])
+  @@index([wineId])
+  @@unique([wineId, locationId])
 }
 
 model User {

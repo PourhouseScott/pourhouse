@@ -63,7 +63,12 @@ export class SquareWineSyncService {
         created += 1;
       }
 
-      const inventoryRows = this.catalogParser.mapVariationsToInventoryRows(item.variations, item.id);
+      const inventoryRows = this.catalogParser
+        .mapVariationsToInventoryRows(item.variations, item.id)
+        .map((row) => ({
+          ...row,
+          locationId: `square:${item.id}`
+        }));
       const syncedRows = await this.squareSyncRepository.replaceInventoryForWine(wine.id, inventoryRows);
       inventoryRowsSynced += syncedRows;
 

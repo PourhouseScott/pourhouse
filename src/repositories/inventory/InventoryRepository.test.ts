@@ -16,14 +16,10 @@ describe("InventoryRepository", () => {
 
     expect(findMany).toHaveBeenCalledWith({
       include: {
-        wineVariation: {
+        wine: {
           include: {
-            wine: {
-              include: {
-                winery: true,
-                region: true
-              }
-            }
+            winery: true,
+            region: true
           }
         }
       },
@@ -46,21 +42,17 @@ describe("InventoryRepository", () => {
     expect(findUnique).toHaveBeenCalledWith({
       where: { id: "inventory-1" },
       include: {
-        wineVariation: {
+        wine: {
           include: {
-            wine: {
-              include: {
-                winery: true,
-                region: true
-              }
-            }
+            winery: true,
+            region: true
           }
         }
       }
     });
   });
 
-  it("create includes the related wineVariation", async () => {
+  it("create includes the related wine", async () => {
     const create = vi.fn().mockResolvedValue(null);
     const prisma = {
       inventory: {
@@ -70,9 +62,9 @@ describe("InventoryRepository", () => {
 
     const repository = new InventoryRepository(prisma);
     const input = {
-      wineVariation: { connect: { id: "variation-1" } },
+      wine: { connect: { id: "wine-1" } },
       locationId: "bar-main",
-      stockQuantity: 5,
+      sealedBottleCount: 5,
       isAvailable: true,
       isFeatured: false
     };
@@ -82,12 +74,12 @@ describe("InventoryRepository", () => {
     expect(create).toHaveBeenCalledWith({
       data: input,
       include: {
-        wineVariation: true
+        wine: true
       }
     });
   });
 
-  it("update includes the related wineVariation", async () => {
+  it("update includes the related wine", async () => {
     const update = vi.fn().mockResolvedValue(null);
     const prisma = {
       inventory: {
@@ -97,7 +89,7 @@ describe("InventoryRepository", () => {
 
     const repository = new InventoryRepository(prisma);
     const input = {
-      stockQuantity: 3,
+      sealedBottleCount: 3,
       isAvailable: false
     };
 
@@ -107,7 +99,7 @@ describe("InventoryRepository", () => {
       where: { id: "inventory-1" },
       data: input,
       include: {
-        wineVariation: true
+        wine: true
       }
     });
   });

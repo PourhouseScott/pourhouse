@@ -81,19 +81,19 @@ describe("createWineSchema", () => {
 });
 
 describe("inventory schemas", () => {
-  it("accepts createInventorySchema with wineVariationId", () => {
+  it("accepts createInventorySchema with wineId", () => {
     expect(
       createInventorySchema.parse({
-        wineVariationId: "11111111-1111-4111-8111-111111111111",
+        wineId: "11111111-1111-4111-8111-111111111111",
         locationId: "bar-main",
-        stockQuantity: 10,
+        sealedBottleCount: 10,
         isAvailable: true,
         isFeatured: false
       })
     ).toEqual({
-      wineVariationId: "11111111-1111-4111-8111-111111111111",
+      wineId: "11111111-1111-4111-8111-111111111111",
       locationId: "bar-main",
-      stockQuantity: 10,
+      sealedBottleCount: 10,
       isAvailable: true,
       isFeatured: false
     });
@@ -102,11 +102,11 @@ describe("inventory schemas", () => {
   it("accepts updateInventorySchema without price fields", () => {
     expect(
       updateInventorySchema.parse({
-        stockQuantity: 4,
+        sealedBottleCount: 4,
         isAvailable: true
       })
     ).toEqual({
-      stockQuantity: 4,
+      sealedBottleCount: 4,
       isAvailable: true
     });
   });

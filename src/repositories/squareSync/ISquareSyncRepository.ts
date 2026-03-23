@@ -8,7 +8,7 @@ export type InventorySyncRow = {
   isPublic?: boolean;
   isDefault?: boolean;
   locationId: string;
-  stockQuantity: number;
+  sealedBottleCount: number;
   isAvailable: boolean;
   isFeatured: boolean;
 };

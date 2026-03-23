@@ -66,7 +66,7 @@ describe("InventoryController", () => {
     vi.mocked(inventoryService.createInventory).mockResolvedValue({ id: "i1" });
 
     const controller = new InventoryController(inventoryService);
-    const req = { body: { wineVariationId: "v1" } } as Request;
+    const req = { body: { wineId: "w1" } } as Request;
     const res = createResponse();
 
     await controller.addInventory(req, res);
@@ -83,15 +83,15 @@ describe("InventoryController", () => {
       updateInventory: vi.fn()
     } as unknown as InventoryService;
 
-    vi.mocked(inventoryService.updateInventory).mockResolvedValue({ id: "i1", stockQuantity: 2 });
+    vi.mocked(inventoryService.updateInventory).mockResolvedValue({ id: "i1", sealedBottleCount: 2 });
 
     const controller = new InventoryController(inventoryService);
-    const req = { params: { id: "i1" }, body: { stockQuantity: 2 } } as unknown as Request;
+    const req = { params: { id: "i1" }, body: { sealedBottleCount: 2 } } as unknown as Request;
     const res = createResponse();
 
     await controller.patchInventory(req, res);
 
-    expect(inventoryService.updateInventory).toHaveBeenCalledWith("i1", { stockQuantity: 2 });
+    expect(inventoryService.updateInventory).toHaveBeenCalledWith("i1", { sealedBottleCount: 2 });
     expect(res.status).toHaveBeenCalledWith(200);
   });
 });

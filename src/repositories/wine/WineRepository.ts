@@ -12,11 +12,9 @@ export class WineRepository implements IWineRepository {
       include: {
         winery: true,
         region: true,
+        inventory: true,
         variations: {
-          where: variationWhere,
-          include: {
-            inventory: true
-          }
+          where: variationWhere
         }
       },
       orderBy: { createdAt: "desc" }
@@ -29,11 +27,8 @@ export class WineRepository implements IWineRepository {
       include: {
         winery: true,
         region: true,
-        variations: {
-          include: {
-            inventory: true
-          }
-        }
+        inventory: true,
+        variations: true
       }
     });
   }
@@ -56,11 +51,8 @@ export class WineRepository implements IWineRepository {
       include: {
         winery: true,
         region: true,
-        variations: {
-          include: {
-            inventory: true
-          }
-        }
+        inventory: true,
+        variations: true
       }
     });
   }
@@ -111,8 +103,7 @@ export class WineRepository implements IWineRepository {
 
   private buildVariationWhere(filters: WineListFilters): Prisma.WineVariationWhereInput {
     return {
-      isPublic: true,
-      ...(filters.featuredOnly ? { inventory: { some: { isFeatured: true } } } : {})
+      isPublic: true
     };
   }
 
@@ -131,6 +122,7 @@ export class WineRepository implements IWineRepository {
         : {}),
       ...(filters.regionId ? { regionId: filters.regionId } : {}),
       ...(filters.wineryId ? { wineryId: filters.wineryId } : {}),
+      ...(filters.featuredOnly ? { inventory: { some: { isFeatured: true } } } : {}),
       variations: {
         some: variationWhere
       }

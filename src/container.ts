@@ -27,7 +27,7 @@ const wineService = new WineService(
   regionRepository,
   ratingRepository
 );
-const inventoryService = new InventoryService(inventoryRepository, wineRepository);
+const inventoryService = new InventoryService(inventoryRepository);
 const ratingService = new RatingService(ratingRepository, wineRepository);
 const authService = new AuthService(userRepository);
 

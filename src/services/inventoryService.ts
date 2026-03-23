@@ -1,26 +1,24 @@
 import type { IInventoryRepository } from "@/repositories/inventory/IInventoryRepository";
-import type { IWineRepository } from "@/repositories/wine/IWineRepository";
 import { AppError } from "@/utils/appError";
 
 export type CreateInventoryInput = {
-  wineVariationId: string;
+  wineId: string;
   locationId: string;
-  stockQuantity: number;
+  sealedBottleCount: number;
   isAvailable?: boolean;
   isFeatured?: boolean;
 };
 
 export type UpdateInventoryInput = {
   locationId?: string;
-  stockQuantity?: number;
+  sealedBottleCount?: number;
   isAvailable?: boolean;
   isFeatured?: boolean;
 };
 
 export class InventoryService {
   public constructor(
-    private readonly inventoryRepository: IInventoryRepository,
-    private readonly wineRepository: IWineRepository
+    private readonly inventoryRepository: IInventoryRepository
   ) { }
 
   public async getInventory() {
@@ -39,9 +37,9 @@ export class InventoryService {
 
   public async createInventory(input: CreateInventoryInput) {
     return this.inventoryRepository.create({
-      wineVariation: { connect: { id: input.wineVariationId } },
+      wine: { connect: { id: input.wineId } },
       locationId: input.locationId,
-      stockQuantity: input.stockQuantity,
+      sealedBottleCount: input.sealedBottleCount,
       isAvailable: input.isAvailable ?? true,
       isFeatured: input.isFeatured ?? false
     });

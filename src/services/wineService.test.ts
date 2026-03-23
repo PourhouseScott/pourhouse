@@ -152,18 +152,18 @@ describe("WineService", () => {
             inventory: [
               {
                 id: "inv-1",
-                wineVariationId: "var-1",
+                wineId: "var-1",
                 locationId: "bar-main",
-                stockQuantity: 5,
+                sealedBottleCount: 5,
                 isAvailable: true,
                 isFeatured: false,
                 createdAt: new Date("2026-03-19T00:00:00.000Z")
               },
               {
                 id: "inv-2",
-                wineVariationId: "var-1",
+                wineId: "var-1",
                 locationId: "bar-patio",
-                stockQuantity: 3,
+                sealedBottleCount: 3,
                 isAvailable: true,
                 isFeatured: true,
                 createdAt: new Date("2026-03-19T00:00:00.000Z")
@@ -314,9 +314,9 @@ describe("WineService", () => {
         inventory: [
           {
             id: "inv-1",
-            wineVariationId: "var-1",
+            wineId: "var-1",
             locationId: "bar-main",
-            stockQuantity: 5,
+            sealedBottleCount: 5,
             isAvailable: true,
             isFeatured: false,
             createdAt: new Date("2026-03-19T00:00:00.000Z")
@@ -356,9 +356,9 @@ describe("WineService", () => {
         inventory: [
           {
             id: "inv-2",
-            wineVariationId: "var-3",
+            wineId: "var-3",
             locationId: "bar-main",
-            stockQuantity: 3,
+            sealedBottleCount: 3,
             isAvailable: true,
             isFeatured: false,
             createdAt: new Date("2026-03-18T00:00:00.000Z")
@@ -564,9 +564,9 @@ describe("WineService", () => {
         inventory: [
           {
             id: "inv-r",
-            wineVariationId: "var-r1",
+            wineId: "var-r1",
             locationId: "main",
-            stockQuantity: 3,
+            sealedBottleCount: 3,
             isAvailable: true,
             isFeatured: true,
             createdAt: new Date("2026-03-19T00:00:00.000Z")
@@ -607,9 +607,9 @@ describe("WineService", () => {
         inventory: [
           {
             id: "inv-w",
-            wineVariationId: "var-w1",
+            wineId: "var-w1",
             locationId: "main",
-            stockQuantity: 5,
+            sealedBottleCount: 5,
             isAvailable: true,
             isFeatured: true,
             createdAt: new Date("2026-03-19T00:00:00.000Z")
@@ -895,9 +895,9 @@ describe("WineService", () => {
         inventory: [
           {
             id: "inv-left",
-            wineVariationId: "var-left1",
+            wineId: "var-left1",
             locationId: "main",
-            stockQuantity: 1,
+            sealedBottleCount: 1,
             isAvailable: true,
             isFeatured: false,
             createdAt: new Date("2026-03-19T00:00:00.000Z")
@@ -934,9 +934,9 @@ describe("WineService", () => {
         inventory: [
           {
             id: "inv-right",
-            wineVariationId: "var-right1",
+            wineId: "var-right1",
             locationId: "main",
-            stockQuantity: 1,
+            sealedBottleCount: 1,
             isAvailable: true,
             isFeatured: false,
             createdAt: new Date("2026-03-19T00:00:00.000Z")

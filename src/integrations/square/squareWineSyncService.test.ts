@@ -79,8 +79,8 @@ describe("SquareWineSyncService", () => {
         volumeOz: 5,
         isPublic: true,
         isDefault: false,
-        locationId: "square:square-var-1",
-        stockQuantity: 0,
+        locationId: "square:square-item-1",
+        sealedBottleCount: 0,
         isAvailable: true,
         isFeatured: false
       },
@@ -91,8 +91,8 @@ describe("SquareWineSyncService", () => {
         volumeOz: 9,
         isPublic: true,
         isDefault: true,
-        locationId: "square:square-var-2",
-        stockQuantity: 0,
+        locationId: "square:square-item-1",
+        sealedBottleCount: 0,
         isAvailable: false,
         isFeatured: false
       }
@@ -186,8 +186,8 @@ describe("SquareWineSyncService", () => {
         volumeOz: 8,
         isPublic: true,
         isDefault: false,
-        locationId: "square:dup-var",
-        stockQuantity: 0,
+        locationId: "square:square-item-dedupe",
+        sealedBottleCount: 0,
         isAvailable: true,
         isFeatured: false
       }
@@ -200,8 +200,8 @@ describe("SquareWineSyncService", () => {
         price: 0,
         isPublic: true,
         isDefault: false,
-        locationId: "square:square-item-no-variation-default",
-        stockQuantity: 0,
+        locationId: "square:square-item-no-variation",
+        sealedBottleCount: 0,
         isAvailable: true,
         isFeatured: false
       }
@@ -367,8 +367,8 @@ describe("SquareWineSyncService", () => {
         price: 0,
         isPublic: true,
         isDefault: false,
-        locationId: "square:square-item-punct-variation",
-        stockQuantity: 0,
+        locationId: "square:square-item-punct",
+        sealedBottleCount: 0,
         isAvailable: true,
         isFeatured: false
       }
@@ -419,8 +419,8 @@ describe("SquareWineSyncService", () => {
         volumeOz: 2,
         isPublic: false,
         isDefault: false,
-        locationId: "square:var-2oz",
-        stockQuantity: 0,
+        locationId: "square:square-item-serving-rules",
+        sealedBottleCount: 0,
         isAvailable: true,
         isFeatured: false
       },
@@ -431,8 +431,8 @@ describe("SquareWineSyncService", () => {
         volumeOz: 9,
         isPublic: true,
         isDefault: true,
-        locationId: "square:var-9oz",
-        stockQuantity: 0,
+        locationId: "square:square-item-serving-rules",
+        sealedBottleCount: 0,
         isAvailable: true,
         isFeatured: false
       }
