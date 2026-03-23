@@ -31,8 +31,10 @@ export class SquareWineSyncService {
         continue;
       }
 
+      const syncedAt = new Date();
+
       const existingWine = await this.squareSyncRepository.findWineBySquareItemId(item.id);
-      const winePayload = {
+      const wineCreatePayload = {
         squareItemId: item.id,
         name: item.name,
         slug: this.buildSlug(item.name, item.id),
@@ -46,9 +48,14 @@ export class SquareWineSyncService {
         imageUrl: "https://images.example.com/square-import-placeholder.jpg"
       };
 
+      const wineSquareUpdatePayload = {
+        name: item.name,
+        slug: this.buildSlug(item.name, item.id)
+      };
+
       const wine = existingWine
-        ? await this.squareSyncRepository.updateWineBySquareItemId(item.id, winePayload)
-        : await this.squareSyncRepository.createWine(winePayload);
+        ? await this.squareSyncRepository.updateWineSquareFieldsBySquareItemId(item.id, wineSquareUpdatePayload)
+        : await this.squareSyncRepository.createWine(wineCreatePayload);
 
       if (existingWine) {
         updated += 1;
@@ -59,6 +66,50 @@ export class SquareWineSyncService {
       const inventoryRows = this.catalogParser.mapVariationsToInventoryRows(item.variations, item.id);
       const syncedRows = await this.squareSyncRepository.replaceInventoryForWine(wine.id, inventoryRows);
       inventoryRowsSynced += syncedRows;
+
+      const squareCatalogItem = await this.squareSyncRepository.upsertSquareCatalogItem({
+        squareItemId: item.id,
+        wineId: wine.id,
+        rawPayload: item as never,
+        extractedData: {
+          id: item.id,
+          name: item.name,
+          description: item.description,
+          isDeleted: item.isDeleted,
+          variationCount: item.variations.length
+        } as never,
+        isDeleted: item.isDeleted,
+        lastSyncedAt: syncedAt
+      });
+
+      const variationIds = inventoryRows
+        .map((row) => row.squareVariationId)
+        .filter((value): value is string => Boolean(value));
+      const variationLookup = await this.squareSyncRepository.findWineVariationsBySquareVariationIds(wine.id, variationIds);
+      const wineVariationIdBySquareVariationId = new Map(
+        variationLookup
+          .filter((variation) => variation.squareVariationId)
+          .map((variation) => [variation.squareVariationId as string, variation.id])
+      );
+
+      await Promise.all(
+        item.variations.map((variation) =>
+          this.squareSyncRepository.upsertSquareCatalogVariation({
+            squareVariationId: variation.id,
+            squareCatalogItemId: squareCatalogItem.id,
+            wineVariationId: wineVariationIdBySquareVariationId.get(variation.id) ?? null,
+            rawPayload: variation as never,
+            extractedData: {
+              id: variation.id,
+              name: variation.name,
+              priceAmountCents: variation.priceAmountCents,
+              isDeleted: variation.isDeleted
+            } as never,
+            isDeleted: variation.isDeleted,
+            lastSyncedAt: syncedAt
+          })
+        )
+      );
     }
 
     return {

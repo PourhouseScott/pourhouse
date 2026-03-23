@@ -26,6 +26,7 @@ model Wine {
   region    Region           @relation(fields: [regionId], references: [id], onDelete: Restrict)
   variations WineVariation[]
   ratings   Rating[]
+  squareCatalogItem SquareCatalogItem?
 
   @@unique([name, wineryId, vintage])
   @@index([regionId])
@@ -45,9 +46,48 @@ model WineVariation {
 
   wine      Wine        @relation(fields: [wineId], references: [id], onDelete: Cascade)
   inventory Inventory[]
+  squareCatalogVariation SquareCatalogVariation?
 
   @@index([wineId])
   @@index([squareVariationId])
+}
+
+model SquareCatalogItem {
+  id           String    @id @default(uuid())
+  squareItemId String    @unique
+  wineId       String?   @unique
+  rawPayload   Json
+  extractedData Json
+  isDeleted    Boolean   @default(false)
+  lastSyncedAt DateTime
+  syncFailedAt DateTime?
+  syncError    String?
+  createdAt    DateTime  @default(now())
+
+  wine         Wine?     @relation(fields: [wineId], references: [id], onDelete: SetNull)
+  variations   SquareCatalogVariation[]
+
+  @@index([wineId])
+}
+
+model SquareCatalogVariation {
+  id                  String    @id @default(uuid())
+  squareVariationId   String    @unique
+  squareCatalogItemId String
+  wineVariationId     String?   @unique
+  rawPayload          Json
+  extractedData       Json
+  isDeleted           Boolean   @default(false)
+  lastSyncedAt        DateTime
+  syncFailedAt        DateTime?
+  syncError           String?
+  createdAt           DateTime  @default(now())
+
+  squareCatalogItem   SquareCatalogItem @relation(fields: [squareCatalogItemId], references: [id], onDelete: Cascade)
+  wineVariation       WineVariation?    @relation(fields: [wineVariationId], references: [id], onDelete: SetNull)
+
+  @@index([squareCatalogItemId])
+  @@index([wineVariationId])
 }
 
 model Winery {

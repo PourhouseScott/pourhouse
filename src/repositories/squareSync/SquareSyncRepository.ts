@@ -1,5 +1,10 @@
 import type { PrismaClient, Prisma } from "@prisma/client";
-import type { ISquareSyncRepository, InventorySyncRow } from "@/repositories/squareSync/ISquareSyncRepository";
+import type {
+  ISquareSyncRepository,
+  InventorySyncRow,
+  SquareCatalogItemUpsertInput,
+  SquareCatalogVariationUpsertInput
+} from "@/repositories/squareSync/ISquareSyncRepository";
 
 const SQUARE_REGION_ID = "00000000-0000-0000-0000-000000000001";
 const SQUARE_WINERY_ID = "00000000-0000-0000-0000-000000000002";
@@ -46,10 +51,76 @@ export class SquareSyncRepository implements ISquareSyncRepository {
     return this.prisma.wine.create({ data: input });
   }
 
-  public async updateWineBySquareItemId(squareItemId: string, input: Prisma.WineUncheckedUpdateInput) {
+  public async updateWineSquareFieldsBySquareItemId(squareItemId: string, input: Prisma.WineUncheckedUpdateInput) {
     return this.prisma.wine.update({
       where: { squareItemId },
       data: input
+    });
+  }
+
+  public async upsertSquareCatalogItem(input: SquareCatalogItemUpsertInput) {
+    return this.prisma.squareCatalogItem.upsert({
+      where: { squareItemId: input.squareItemId },
+      update: {
+        wineId: input.wineId,
+        rawPayload: input.rawPayload,
+        extractedData: input.extractedData,
+        isDeleted: input.isDeleted,
+        lastSyncedAt: input.lastSyncedAt,
+        syncFailedAt: null,
+        syncError: null
+      },
+      create: {
+        squareItemId: input.squareItemId,
+        wineId: input.wineId,
+        rawPayload: input.rawPayload,
+        extractedData: input.extractedData,
+        isDeleted: input.isDeleted,
+        lastSyncedAt: input.lastSyncedAt
+      },
+      select: { id: true }
+    });
+  }
+
+  public async upsertSquareCatalogVariation(input: SquareCatalogVariationUpsertInput) {
+    await this.prisma.squareCatalogVariation.upsert({
+      where: { squareVariationId: input.squareVariationId },
+      update: {
+        squareCatalogItemId: input.squareCatalogItemId,
+        wineVariationId: input.wineVariationId,
+        rawPayload: input.rawPayload,
+        extractedData: input.extractedData,
+        isDeleted: input.isDeleted,
+        lastSyncedAt: input.lastSyncedAt,
+        syncFailedAt: null,
+        syncError: null
+      },
+      create: {
+        squareVariationId: input.squareVariationId,
+        squareCatalogItemId: input.squareCatalogItemId,
+        wineVariationId: input.wineVariationId,
+        rawPayload: input.rawPayload,
+        extractedData: input.extractedData,
+        isDeleted: input.isDeleted,
+        lastSyncedAt: input.lastSyncedAt
+      }
+    });
+  }
+
+  public async findWineVariationsBySquareVariationIds(wineId: string, squareVariationIds: string[]) {
+    if (squareVariationIds.length === 0) {
+      return [];
+    }
+
+    return this.prisma.wineVariation.findMany({
+      where: {
+        wineId,
+        squareVariationId: { in: squareVariationIds }
+      },
+      select: {
+        id: true,
+        squareVariationId: true
+      }
     });
   }
 

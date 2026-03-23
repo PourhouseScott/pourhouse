@@ -1,7 +1,11 @@
 import type { Wine } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { SquareWineSyncService } from "@/integrations/square/squareWineSyncService";
-import type { ISquareSyncRepository, InventorySyncRow } from "@/repositories/squareSync/ISquareSyncRepository";
+import type {
+  ISquareSyncRepository,
+  InventorySyncRow,
+  WineVariationKey
+} from "@/repositories/squareSync/ISquareSyncRepository";
 
 function createSquareSyncRepositoryMock(): ISquareSyncRepository {
   return {
@@ -11,8 +15,11 @@ function createSquareSyncRepositoryMock(): ISquareSyncRepository {
     }),
     findWineBySquareItemId: vi.fn().mockResolvedValue(null),
     createWine: vi.fn().mockResolvedValue({ id: "wine-created" } as Wine),
-    updateWineBySquareItemId: vi.fn().mockResolvedValue({ id: "wine-updated" } as Wine),
-    replaceInventoryForWine: vi.fn().mockImplementation(async (_wineId: string, rows: InventorySyncRow[]) => rows.length)
+    updateWineSquareFieldsBySquareItemId: vi.fn().mockResolvedValue({ id: "wine-updated" } as Wine),
+    upsertSquareCatalogItem: vi.fn().mockResolvedValue({ id: "square-catalog-item-1" }),
+    upsertSquareCatalogVariation: vi.fn().mockResolvedValue(undefined),
+    replaceInventoryForWine: vi.fn().mockImplementation(async (_wineId: string, rows: InventorySyncRow[]) => rows.length),
+    findWineVariationsBySquareVariationIds: vi.fn().mockResolvedValue([] as WineVariationKey[])
   };
 }
 
@@ -56,7 +63,7 @@ describe("SquareWineSyncService", () => {
     const result = await service.syncCatalogObjects(catalogObjects);
 
     expect(repository.createWine).toHaveBeenCalledTimes(1);
-    expect(repository.updateWineBySquareItemId).not.toHaveBeenCalled();
+    expect(repository.updateWineSquareFieldsBySquareItemId).not.toHaveBeenCalled();
     expect(result).toEqual({
       created: 1,
       updated: 0,
@@ -111,7 +118,11 @@ describe("SquareWineSyncService", () => {
     const result = await service.syncCatalogObjects(catalogObjects);
 
     expect(repository.createWine).not.toHaveBeenCalled();
-    expect(repository.updateWineBySquareItemId).toHaveBeenCalledTimes(1);
+    expect(repository.updateWineSquareFieldsBySquareItemId).toHaveBeenCalledTimes(1);
+    expect(repository.updateWineSquareFieldsBySquareItemId).toHaveBeenCalledWith("square-item-existing", {
+      name: "Existing Wine",
+      slug: "existing-wine-square-item-existing"
+    });
     expect(result.created).toBe(0);
     expect(result.updated).toBe(1);
   });
@@ -220,7 +231,7 @@ describe("SquareWineSyncService", () => {
       inventoryRowsSynced: 0
     });
     expect(repository.createWine).not.toHaveBeenCalled();
-    expect(repository.updateWineBySquareItemId).not.toHaveBeenCalled();
+    expect(repository.updateWineSquareFieldsBySquareItemId).not.toHaveBeenCalled();
     expect(repository.replaceInventoryForWine).not.toHaveBeenCalled();
   });
 
@@ -249,8 +260,53 @@ describe("SquareWineSyncService", () => {
       inventoryRowsSynced: 0
     });
     expect(repository.createWine).not.toHaveBeenCalled();
-    expect(repository.updateWineBySquareItemId).not.toHaveBeenCalled();
+    expect(repository.updateWineSquareFieldsBySquareItemId).not.toHaveBeenCalled();
     expect(repository.replaceInventoryForWine).not.toHaveBeenCalled();
+  });
+
+  it("persists square source records for items and variations", async () => {
+    const repository = createSquareSyncRepositoryMock();
+    vi.mocked(repository.findWineVariationsBySquareVariationIds).mockResolvedValue([
+      {
+        id: "wine-var-1",
+        squareVariationId: "square-var-1"
+      }
+    ]);
+    const service = new SquareWineSyncService(repository);
+
+    const catalogObjects = [
+      {
+        type: "ITEM",
+        id: "square-item-persist",
+        itemData: {
+          name: "Persist Test",
+          description: "Raw payload test",
+          variations: [
+            {
+              id: "square-var-1",
+              itemVariationData: {
+                name: "5oz",
+                priceMoney: {
+                  amount: 1000
+                }
+              }
+            }
+          ]
+        }
+      }
+    ] as never[];
+
+    await service.syncCatalogObjects(catalogObjects);
+
+    expect(repository.upsertSquareCatalogItem).toHaveBeenCalledTimes(1);
+    expect(repository.upsertSquareCatalogVariation).toHaveBeenCalledTimes(1);
+    expect(repository.upsertSquareCatalogVariation).toHaveBeenCalledWith(
+      expect.objectContaining({
+        squareVariationId: "square-var-1",
+        squareCatalogItemId: "square-catalog-item-1",
+        wineVariationId: "wine-var-1"
+      })
+    );
   });
 
   it("applies fallback parsing rules for missing fields and slug normalization", async () => {
