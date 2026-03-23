@@ -62,7 +62,9 @@ export function inferWineType(wine: WineWithInventory): WineType {
 }
 
 export function toWineListItem(wine: WineWithInventory): WineListItem {
-  const prices = wine.variations.map((variation) => Number(variation.price));
+  // Only consider public variations for pricing display
+  const publicVariations = wine.variations.filter((variation) => variation.isPublic);
+  const prices = publicVariations.map((variation) => Number(variation.price));
 
   return {
     id: wine.id,

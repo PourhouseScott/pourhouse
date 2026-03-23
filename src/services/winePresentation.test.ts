@@ -136,4 +136,76 @@ describe("winePresentation", () => {
     expect(compareWineListItems({ wine: lowPriceWine, item: lowItem }, { wine: highPriceWine, item: highItem }, "priceGlass", "asc")).toBeLessThan(0);
     expect(compareWineListItems({ wine: lowPriceWine, item: lowItem }, { wine: highPriceWine, item: highItem }, "priceBottle", "desc")).toBeGreaterThan(0);
   });
+
+  it("filters out non-public variations from pricing", () => {
+    const wine = createWine({
+      variations: [
+        {
+          id: "var-private",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "2oz (Internal)",
+          price: new Decimal(8),
+          volumeOz: 2,
+          isPublic: false,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-public-5oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "5oz",
+          price: new Decimal(15),
+          volumeOz: 5,
+          isPublic: true,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-public-9oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "9oz",
+          price: new Decimal(24),
+          volumeOz: 9,
+          isPublic: true,
+          isDefault: true,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        }
+      ]
+    });
+
+    const item = toWineListItem(wine);
+
+    // Should exclude the $8 private variation and only consider 15 and 24
+    expect(item.pricing.glass).toBe(15);
+    expect(item.pricing.bottle).toBe(24);
+  });
+
+  it("returns null pricing when only non-public variations exist", () => {
+    const wine = createWine({
+      variations: [
+        {
+          id: "var-private-only",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "2oz (Internal)",
+          price: new Decimal(8),
+          volumeOz: 2,
+          isPublic: false,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        }
+      ]
+    });
+
+    const item = toWineListItem(wine);
+
+    expect(item.pricing).toEqual({ glass: null, bottle: null });
+  });
 });
