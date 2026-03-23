@@ -5,7 +5,8 @@ import type { IWineryRepository } from "@/repositories/winery/IWineryRepository"
 import {
   compareWineListItems as compareWineListItemsForDisplay,
   inferWineType as inferWineTypeForDisplay,
-  toWineListItem as toWineListItemForDisplay
+  toWineListItem as toWineListItemForDisplay,
+  type DefaultVariation
 } from "@/services/winePresentation";
 import { AppError } from "@/utils/appError";
 import { normalizeSlugSegment } from "@/utils/slug";
@@ -30,6 +31,7 @@ export type WineListItem = {
     glass: number | null;
     bottle: number | null;
   };
+  defaultVariation: DefaultVariation | null;
 };
 
 export type WineType = "red" | "white" | "rose" | "sparkling" | "dessert" | "fortified" | "other";

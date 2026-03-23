@@ -1,7 +1,7 @@
 import { Decimal } from "@prisma/client/runtime/library";
 import { describe, expect, it } from "vitest";
 import type { WineWithInventory } from "@/repositories/wine/IWineRepository";
-import { compareWineListItems, inferWineType, toWineListItem } from "@/services/winePresentation";
+import { compareWineListItems, inferWineType, toWineListItem, getDefaultVariation } from "@/services/winePresentation";
 
 function createWine(overrides: Partial<WineWithInventory> = {}): WineWithInventory {
   return {
@@ -207,5 +207,245 @@ describe("winePresentation", () => {
     const item = toWineListItem(wine);
 
     expect(item.pricing).toEqual({ glass: null, bottle: null });
+  });
+
+  it("selects 5oz as default when available", () => {
+    const wine = createWine({
+      variations: [
+        {
+          id: "var-3oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "3oz",
+          price: new Decimal(10),
+          volumeOz: 3,
+          isPublic: true,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-5oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "5oz",
+          price: new Decimal(15),
+          volumeOz: 5,
+          isPublic: true,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-9oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "9oz",
+          price: new Decimal(24),
+          volumeOz: 9,
+          isPublic: true,
+          isDefault: true,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        }
+      ]
+    });
+
+    const defaultVar = getDefaultVariation(wine);
+
+    expect(defaultVar).toEqual({
+      id: "var-5oz",
+      name: "5oz",
+      price: 15,
+      volumeOz: 5
+    });
+  });
+
+  it("falls back to first public variation when 5oz unavailable", () => {
+    const wine = createWine({
+      variations: [
+        {
+          id: "var-3oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "3oz",
+          price: new Decimal(10),
+          volumeOz: 3,
+          isPublic: true,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-9oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "9oz",
+          price: new Decimal(24),
+          volumeOz: 9,
+          isPublic: true,
+          isDefault: true,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        }
+      ]
+    });
+
+    const defaultVar = getDefaultVariation(wine);
+
+    expect(defaultVar).toEqual({
+      id: "var-3oz",
+      name: "3oz",
+      price: 10,
+      volumeOz: 3
+    });
+  });
+
+  it("falls back to largest price when no public variations", () => {
+    const wine = createWine({
+      variations: [
+        {
+          id: "var-private-small",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "2oz (Internal)",
+          price: new Decimal(8),
+          volumeOz: 2,
+          isPublic: false,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-private-large",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "16oz (Internal)",
+          price: new Decimal(40),
+          volumeOz: 16,
+          isPublic: false,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        }
+      ]
+    });
+
+    const defaultVar = getDefaultVariation(wine);
+
+    expect(defaultVar).toEqual({
+      id: "var-private-large",
+      name: "16oz (Internal)",
+      price: 40,
+      volumeOz: 16
+    });
+  });
+
+  it("returns null when wine has no variations", () => {
+    const wine = createWine({ variations: [] });
+
+    const defaultVar = getDefaultVariation(wine);
+
+    expect(defaultVar).toBeNull();
+  });
+
+  it("selects largest price when multiple non-public variations exist", () => {
+    const wine = createWine({
+      variations: [
+        {
+          id: "var-1",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "1oz",
+          price: new Decimal(5),
+          volumeOz: 1,
+          isPublic: false,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-3",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "3oz",
+          price: new Decimal(15),
+          volumeOz: 3,
+          isPublic: false,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-2",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "2oz",
+          price: new Decimal(10),
+          volumeOz: 2,
+          isPublic: false,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        }
+      ]
+    });
+
+    const defaultVar = getDefaultVariation(wine);
+
+    expect(defaultVar).toEqual({
+      id: "var-3",
+      name: "3oz",
+      price: 15,
+      volumeOz: 3
+    });
+  });
+
+  it("includes defaultVariation in toWineListItem response", () => {
+    const wine = createWine();
+
+    const item = toWineListItem(wine);
+
+    expect(item.defaultVariation).toEqual({
+      id: "var-1",
+      name: "5oz",
+      price: 15,
+      volumeOz: 5
+    });
+  });
+
+  it("prioritizes 5oz even if another variation is marked isDefault", () => {
+    const wine = createWine({
+      variations: [
+        {
+          id: "var-5oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "5oz",
+          price: new Decimal(15),
+          volumeOz: 5,
+          isPublic: true,
+          isDefault: false,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        },
+        {
+          id: "var-9oz",
+          wineId: "w1",
+          squareVariationId: null,
+          name: "9oz",
+          price: new Decimal(24),
+          volumeOz: 9,
+          isPublic: true,
+          isDefault: true,
+          createdAt: new Date("2026-03-19T00:00:00.000Z"),
+          inventory: []
+        }
+      ]
+    });
+
+    const defaultVar = getDefaultVariation(wine);
+
+    expect(defaultVar?.volumeOz).toBe(5);
   });
 });

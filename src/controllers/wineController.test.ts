@@ -97,7 +97,8 @@ describe("WineController", () => {
           pricing: {
             glass: 16,
             bottle: 68
-          }
+          },
+          defaultVariation: null
         }
       ],
       page: 2,
@@ -134,7 +135,8 @@ describe("WineController", () => {
           pricing: {
             glass: 16,
             bottle: 68
-          }
+          },
+          defaultVariation: null
         }
       ],
       page: 2,
@@ -275,7 +277,8 @@ describe("WineController", () => {
                   pricing: {
                     glass: 16,
                     bottle: 68
-                  }
+                  },
+                  defaultVariation: null
                 }
               ]
             }

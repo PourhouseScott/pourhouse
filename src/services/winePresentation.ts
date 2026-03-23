@@ -1,10 +1,18 @@
 import type { WineWithInventory } from "@/repositories/wine/IWineRepository";
+import type { WineVariation } from "@prisma/client";
 
 export type WineType = "red" | "white" | "rose" | "sparkling" | "dessert" | "fortified" | "other";
 
 export type WineListSort = "createdAt" | "name" | "priceGlass" | "priceBottle";
 
 export type SortOrder = "asc" | "desc";
+
+export type DefaultVariation = {
+  id: string;
+  name: string;
+  price: number;
+  volumeOz: number | null;
+};
 
 export type WineListItem = {
   id: string;
@@ -26,6 +34,7 @@ export type WineListItem = {
     glass: number | null;
     bottle: number | null;
   };
+  defaultVariation: DefaultVariation | null;
 };
 
 export function inferWineType(wine: WineWithInventory): WineType {
@@ -61,6 +70,43 @@ export function inferWineType(wine: WineWithInventory): WineType {
   return "other";
 }
 
+export function getDefaultVariation(wine: WineWithInventory): DefaultVariation | null {
+  if (wine.variations.length === 0) {
+    return null;
+  }
+
+  // Priority 1: Look for 5oz public variation
+  const fiveOzVariation = wine.variations.find((v) => v.isPublic && v.volumeOz === 5);
+  if (fiveOzVariation) {
+    return {
+      id: fiveOzVariation.id,
+      name: fiveOzVariation.name,
+      price: Number(fiveOzVariation.price),
+      volumeOz: fiveOzVariation.volumeOz
+    };
+  }
+
+  // Priority 2: First public variation
+  const firstPublicVariation = wine.variations.find((v) => v.isPublic);
+  if (firstPublicVariation) {
+    return {
+      id: firstPublicVariation.id,
+      name: firstPublicVariation.name,
+      price: Number(firstPublicVariation.price),
+      volumeOz: firstPublicVariation.volumeOz
+    };
+  }
+
+  // Priority 3: Largest price variation (fallback for edge cases)
+  const largestByPrice = wine.variations.reduce((max, v) => (Number(v.price) > Number(max.price) ? v : max));
+  return {
+    id: largestByPrice.id,
+    name: largestByPrice.name,
+    price: Number(largestByPrice.price),
+    volumeOz: largestByPrice.volumeOz
+  };
+}
+
 export function toWineListItem(wine: WineWithInventory): WineListItem {
   // Only consider public variations for pricing display
   const publicVariations = wine.variations.filter((variation) => variation.isPublic);
@@ -85,7 +131,8 @@ export function toWineListItem(wine: WineWithInventory): WineListItem {
     pricing: {
       glass: prices.length > 0 ? Math.min(...prices) : null,
       bottle: prices.length > 0 ? Math.max(...prices) : null
-    }
+    },
+    defaultVariation: getDefaultVariation(wine)
   };
 }
 

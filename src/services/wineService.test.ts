@@ -209,6 +209,12 @@ describe("WineService", () => {
           pricing: {
             glass: 18,
             bottle: 68
+          },
+          defaultVariation: {
+            id: "var-1",
+            name: "By the Glass",
+            price: 18,
+            volumeOz: 6
           }
         }
       ],
@@ -277,7 +283,8 @@ describe("WineService", () => {
           pricing: {
             glass: null,
             bottle: null
-          }
+          },
+          defaultVariation: null
         }
       ],
       page: 1,
@@ -405,6 +412,12 @@ describe("WineService", () => {
           pricing: {
             glass: 20,
             bottle: 80
+          },
+          defaultVariation: {
+            id: "var-1",
+            name: "By the Glass",
+            price: 20,
+            volumeOz: 6
           }
         }
       ],
@@ -474,7 +487,8 @@ describe("WineService", () => {
           pricing: {
             glass: null,
             bottle: null
-          }
+          },
+          defaultVariation: null
         },
         {
           id: "w1",
@@ -495,7 +509,8 @@ describe("WineService", () => {
           pricing: {
             glass: null,
             bottle: null
-          }
+          },
+          defaultVariation: null
         }
       ],
       page: 1,
@@ -645,6 +660,12 @@ describe("WineService", () => {
                   pricing: {
                     glass: 18,
                     bottle: 72
+                  },
+                  defaultVariation: {
+                    id: "var-r1",
+                    name: "By the Glass",
+                    price: 18,
+                    volumeOz: 6
                   }
                 }
               ]
@@ -677,6 +698,12 @@ describe("WineService", () => {
                   pricing: {
                     glass: 15,
                     bottle: 60
+                  },
+                  defaultVariation: {
+                    id: "var-w1",
+                    name: "By the Glass",
+                    price: 15,
+                    volumeOz: 6
                   }
                 }
               ]
@@ -728,7 +755,8 @@ describe("WineService", () => {
                   pricing: {
                     glass: null,
                     bottle: null
-                  }
+                  },
+                  defaultVariation: null
                 }
               ]
             }
