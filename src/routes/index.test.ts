@@ -26,4 +26,21 @@ describe("routes index", () => {
     expect(response.headers["content-type"]).toContain("javascript");
     expect(response.text).toContain("loadWineBySlug");
   });
+
+  it("serves the embeddable wine list shell", async () => {
+    const response = await request(app).get("/embed/wine-list");
+
+    expect(response.status).toBe(200);
+    expect(response.headers["content-type"]).toContain("text/html");
+    expect(response.text).toContain("id=\"wine-list-embed-root\"");
+    expect(response.text).toContain("/static/wine-list-embed.js");
+  });
+
+  it("serves embeddable wine list static assets", async () => {
+    const response = await request(app).get("/static/wine-list-embed-loader.js");
+
+    expect(response.status).toBe(200);
+    expect(response.headers["content-type"]).toContain("javascript");
+    expect(response.text).toContain("createPourhouseWineListEmbed");
+  });
 });
