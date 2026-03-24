@@ -138,7 +138,7 @@ You can also run individual steps as needed.
 
 ### Wines
 
-- `GET /api/wines` - returns a paginated wine list with optional filters and summarized `pricing.glass` / `pricing.bottle` values
+- `GET /api/wines` - returns a paginated wine list with optional filters and public availability flags
 - `GET /api/wines/grouped` - returns wines grouped by inferred type, then by region
 - `GET /api/wines/:slug`
 - `GET /api/wines/qr/:code` - resolves a QR code token (slug or Square item id) and redirects to `/wines/:slug`
@@ -180,10 +180,9 @@ Example `GET /api/wines` response:
         "id": "region-1",
         "name": "Napa Valley"
       },
-      "pricing": {
-        "glass": 16,
-        "bottle": 68
-      }
+      "availableByBottle": true,
+      "availableByGlass": true,
+      "availableForFlight": false
     }
   ],
   "page": 1,
@@ -227,10 +226,9 @@ Example `GET /api/wines/grouped` response:
                 "id": "region-1",
                 "name": "Napa Valley"
               },
-              "pricing": {
-                "glass": 16,
-                "bottle": 68
-              }
+              "availableByBottle": true,
+              "availableByGlass": true,
+              "availableForFlight": false
             }
           ]
         }
@@ -239,6 +237,46 @@ Example `GET /api/wines/grouped` response:
   ],
   "totalWines": 1
 }
+```
+
+## Embeddable Wine List
+
+The embeddable wine list is available at `GET /embed/wine-list` and loads grouped wines from `GET /api/wines/grouped`.
+
+### Iframe Embed
+
+```html
+<iframe
+  src="https://your-domain.example/embed/wine-list"
+  style="width:100%;height:780px;border:0;display:block"
+  loading="lazy"
+></iframe>
+```
+
+Optional compact mode:
+
+```html
+<iframe
+  src="https://your-domain.example/embed/wine-list?compact=true"
+  style="width:100%;height:700px;border:0;display:block"
+  loading="lazy"
+></iframe>
+```
+
+### Script Embed
+
+Load the helper script and mount the iframe programmatically:
+
+```html
+<div id="pourhouse-wine-list"></div>
+<script src="https://your-domain.example/static/wine-list-embed-loader.js"></script>
+<script>
+  window.createPourhouseWineListEmbed(document.getElementById("pourhouse-wine-list"), {
+    baseUrl: "https://your-domain.example",
+    compact: false,
+    height: "780px"
+  });
+</script>
 ```
 
 Example `POST /api/wines` request body:

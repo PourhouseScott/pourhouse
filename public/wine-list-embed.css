@@ -1,0 +1,234 @@
+:root {
+  --paper: #f6f1e7;
+  --ink: #1d1d1a;
+  --ink-soft: #585752;
+  --line: rgba(29, 29, 26, 0.16);
+  --accent: #b44f2e;
+  --accent-soft: rgba(180, 79, 46, 0.14);
+  --glass: #2f6c61;
+  --bottle: #7d2435;
+  --flight: #3d4d9c;
+  --card: rgba(255, 255, 255, 0.84);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Manrope", "Segoe UI", sans-serif;
+  color: var(--ink);
+  background:
+    radial-gradient(90% 80% at 0% 0%, #ffd7ab 0%, rgba(255, 215, 171, 0) 55%),
+    radial-gradient(90% 80% at 100% 100%, #c4dece 0%, rgba(196, 222, 206, 0) 50%),
+    linear-gradient(160deg, #f4ecdd 0%, #f1e4cf 48%, #e6d8be 100%);
+}
+
+.embed-shell {
+  min-height: 100vh;
+  padding: 18px;
+}
+
+.embed-shell[data-compact="true"] {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.hero {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: var(--card);
+  backdrop-filter: blur(3px);
+  box-shadow: 0 12px 34px rgba(22, 22, 20, 0.14);
+  padding: 18px;
+}
+
+.hero p {
+  margin: 0;
+}
+
+.kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.hero h1 {
+  margin: 10px 0 8px;
+  font-family: "Prata", Georgia, serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  line-height: 1.08;
+}
+
+.subtitle {
+  color: var(--ink-soft);
+  line-height: 1.52;
+}
+
+.state-card {
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  padding: 20px;
+}
+
+.state-card h1 {
+  margin: 8px 0 8px;
+  font-family: "Prata", Georgia, serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+}
+
+.state-kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+  font-weight: 700;
+}
+
+.state-card--error {
+  border-color: rgba(180, 79, 46, 0.3);
+  background: linear-gradient(180deg, rgba(255, 251, 247, 0.92), rgba(255, 234, 223, 0.9));
+}
+
+.groups {
+  margin-top: 14px;
+  display: grid;
+  gap: 14px;
+}
+
+.type-block {
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 10px 24px rgba(21, 21, 19, 0.08);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: blockIn 280ms ease-out forwards;
+}
+
+.type-head {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.2));
+}
+
+.type-head h2 {
+  margin: 0;
+  font-family: "Prata", Georgia, serif;
+  font-size: 1.3rem;
+  text-transform: capitalize;
+}
+
+.region {
+  padding: 14px 16px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.region:last-child {
+  border-bottom: 0;
+}
+
+.region h3 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.wine-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.wine-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 10px;
+}
+
+.wine-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.wine-meta {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+}
+
+.badges {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge {
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid transparent;
+}
+
+.badge--glass {
+  background: color-mix(in srgb, var(--glass) 16%, white);
+  border-color: color-mix(in srgb, var(--glass) 28%, white);
+  color: var(--glass);
+}
+
+.badge--bottle {
+  background: color-mix(in srgb, var(--bottle) 14%, white);
+  border-color: color-mix(in srgb, var(--bottle) 30%, white);
+  color: var(--bottle);
+}
+
+.badge--flight {
+  background: color-mix(in srgb, var(--flight) 16%, white);
+  border-color: color-mix(in srgb, var(--flight) 30%, white);
+  color: var(--flight);
+}
+
+.badge--out {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: var(--ink-soft);
+}
+
+@keyframes blockIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 720px) {
+  .embed-shell {
+    padding: 22px;
+  }
+
+  .groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
