@@ -24,6 +24,8 @@ export const createWine = async (req: Request, res: Response) => {
     res.status(201).json(wine);
   } catch (err) {
     if (err instanceof z.ZodError) {
+      // eslint-disable-next-line no-console
+      console.error('Zod validation error:', err.errors);
       res.status(422).json({ error: 'Validation failed', details: err.errors });
     } else {
       res.status(400).json({ error: 'Failed to create wine', details: err instanceof Error ? err.message : err });
