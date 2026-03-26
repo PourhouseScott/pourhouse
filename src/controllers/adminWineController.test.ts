@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as adminWineController from './adminWineController';
+import { adminWineService } from '@/controllers/_adminWineControllerDeps';
 import { Request, Response } from 'express';
 
 
@@ -30,7 +31,7 @@ describe('adminWineController', () => {
     const req = {} as Request;
     const res = mockRes();
     const wines = [{ id: '1', name: 'Test Wine' }];
-    require('@/controllers/_adminWineControllerDeps').adminWineService.listWines.mockResolvedValue(wines);
+    adminWineService.listWines.mockResolvedValue(wines);
     await adminWineController.listWines(req, res);
     expect(res.json).toHaveBeenCalledWith(wines);
   });
@@ -43,7 +44,7 @@ describe('adminWineController', () => {
     } as unknown as Request;
     const res = mockRes();
     const wine = { id: '1', name: 'Wine' };
-    require('@/controllers/_adminWineControllerDeps').adminWineService.createWine.mockResolvedValue(wine);
+    adminWineService.createWine.mockResolvedValue(wine);
     await adminWineController.createWine(req, res);
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(wine);
@@ -61,7 +62,7 @@ describe('adminWineController', () => {
     const req = { params: { id: '1' }, body: { name: 'Updated' } } as unknown as Request;
     const res = mockRes();
     const wine = { id: '1', name: 'Updated' };
-    require('@/controllers/_adminWineControllerDeps').adminWineService.updateWine.mockResolvedValue(wine);
+    adminWineService.updateWine.mockResolvedValue(wine);
     await adminWineController.updateWine(req, res);
     expect(res.json).toHaveBeenCalledWith(wine);
   });
@@ -77,7 +78,7 @@ describe('adminWineController', () => {
   it('should delete wine', async () => {
     const req = { params: { id: '1' } } as unknown as Request;
     const res = mockRes();
-    require('@/controllers/_adminWineControllerDeps').adminWineService.deleteWine.mockResolvedValue(undefined);
+    adminWineService.deleteWine.mockResolvedValue(undefined);
     await adminWineController.deleteWine(req, res);
     expect(res.status).toHaveBeenCalledWith(204);
     expect(res.send).toHaveBeenCalled();
