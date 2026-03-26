@@ -25,7 +25,9 @@ function createService() {
     findByUniqueNameWineryVintage: vi.fn(),
     search: vi.fn(),
     findBySlug: vi.fn(),
-    findBySquareItemId: vi.fn()
+    findBySquareItemId: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
   };
 
   return {

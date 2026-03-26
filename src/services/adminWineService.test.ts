@@ -33,7 +33,7 @@ describe('AdminWineService', () => {
 
   it('updateWine throws if update not implemented', async () => {
     const repo = mockWineRepository();
-    delete repo.update;
+    repo.update = undefined as any;
     const service = new AdminWineService(repo as any);
     await expect(service.updateWine('id', {})).rejects.toThrow('Update not implemented in repository');
   });
@@ -47,7 +47,7 @@ describe('AdminWineService', () => {
 
   it('deleteWine throws if delete not implemented', async () => {
     const repo = mockWineRepository();
-    delete repo.delete;
+    repo.delete = undefined as any;
     const service = new AdminWineService(repo as any);
     await expect(service.deleteWine('id')).rejects.toThrow('Delete not implemented in repository');
   });

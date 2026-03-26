@@ -23,7 +23,8 @@ export const createWine = async (req: Request, res: Response) => {
     // Ensure slug is present (required by Prisma)
     const wineInput = {
       ...parsed,
-      slug: parsed.slug ?? parsed.name.toLowerCase().replace(/\s+/g, '-')
+      slug: 'slug' in parsed ? (parsed as any).slug : parsed.name.toLowerCase().replace(/\s+/g, '-'),
+      squareItemId: parsed.squareItemId ?? null
     };
     const wine = await adminWineService.createWine(wineInput);
     res.status(201).json(wine);
