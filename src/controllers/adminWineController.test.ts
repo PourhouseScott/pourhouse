@@ -41,8 +41,8 @@ describe('adminWineController', () => {
     const input = {
       name: 'Wine',
       vintage: 2020,
-      wineryId: '11111111-1111-1111-1111-111111111111',
-      regionId: '22222222-2222-2222-2222-222222222222',
+      wineryId: '550e8400-e29b-41d4-a716-446655440000',
+      regionId: '123e4567-e89b-12d3-a456-426614174000',
       country: 'US',
       grapeVarieties: ['Cabernet'],
       alcoholPercent: 13.5,
