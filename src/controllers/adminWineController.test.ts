@@ -98,6 +98,28 @@ describe('adminWineController', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to create wine' }));
   });
 
+  it('should handle non-Error object in createWine else branch', async () => {
+    const req = {
+      body: {
+        name: 'Wine',
+        vintage: 2020,
+        wineryId: '550e8400-e29b-41d4-a716-446655440000',
+        regionId: '123e4567-e89b-12d3-a456-426614174000',
+        country: 'US',
+        grapeVarieties: ['Cabernet'],
+        alcoholPercent: 13.5,
+        description: 'desc',
+        imageUrl: 'http://img.com',
+        squareItemId: 'sqid'
+      }
+    } as unknown as Request;
+    const res = mockRes();
+    adminWineService.createWine.mockRejectedValue('fail-string');
+    await adminWineController.createWine(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to create wine', details: 'fail-string' }));
+  });
+
   it('should return 422 for invalid create input', async () => {
     const req = { body: { name: '' } } as unknown as Request;
     const res = mockRes();
@@ -124,6 +146,15 @@ describe('adminWineController', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to update wine' }));
   });
 
+  it('should handle non-Error object in updateWine else branch', async () => {
+    const req = { params: { id: '1' }, body: { name: 'Updated' } } as unknown as Request;
+    const res = mockRes();
+    adminWineService.updateWine.mockRejectedValue(12345);
+    await adminWineController.updateWine(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to update wine', details: 12345 }));
+  });
+
   it('should return 422 for invalid update input', async () => {
     const req = { params: { id: '1' }, body: { vintage: 1800 } } as unknown as Request;
     const res = mockRes();
@@ -148,5 +179,14 @@ describe('adminWineController', () => {
     await adminWineController.deleteWine(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to delete wine' }));
+  });
+
+  it('should handle non-Error object in deleteWine else branch', async () => {
+    const req = { params: { id: '1' } } as unknown as Request;
+    const res = mockRes();
+    adminWineService.deleteWine.mockRejectedValue({ foo: 'bar' });
+    await adminWineController.deleteWine(req, res);
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to delete wine', details: { foo: 'bar' } }));
   });
 });
