@@ -46,6 +46,15 @@ describe('adminWineController', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to list wines' }));
   });
 
+  it('should handle non-Error object in listWines error branch', async () => {
+    const req = {} as Request;
+    const res = mockRes();
+    adminWineService.listWines.mockRejectedValue('fail-string');
+    await adminWineController.listWines(req, res);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to list wines', details: 'fail-string' }));
+  });
+
   it('should create wine with valid input', async () => {
     const input = {
       name: 'Wine',
