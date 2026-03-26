@@ -426,4 +426,25 @@ describe("WineRepository", () => {
       orderBy: { createdAt: "desc" }
     });
   });
+
+  it("update calls prisma.wine.update with correct args", async () => {
+    const update = vi.fn().mockResolvedValue({ id: "wine-1", name: "Updated Wine" });
+    const prisma = { wine: { update } } as never;
+    const repository = new WineRepository(prisma);
+    const result = await repository.update("wine-1", { name: "Updated Wine" });
+    expect(update).toHaveBeenCalledWith({
+      where: { id: "wine-1" },
+      data: { name: "Updated Wine" },
+      include: { winery: true, region: true }
+    });
+    expect(result).toEqual({ id: "wine-1", name: "Updated Wine" });
+  });
+
+  it("delete calls prisma.wine.delete with correct args", async () => {
+    const deleteFn = vi.fn().mockResolvedValue(undefined);
+    const prisma = { wine: { delete: deleteFn } } as never;
+    const repository = new WineRepository(prisma);
+    await repository.delete("wine-1");
+    expect(deleteFn).toHaveBeenCalledWith({ where: { id: "wine-1" } });
+  });
 });
