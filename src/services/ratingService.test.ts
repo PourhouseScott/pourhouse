@@ -18,7 +18,9 @@ function createService() {
     findBySlugWithInventory: vi.fn(),
     findByUniqueNameWineryVintage: vi.fn(),
     create: vi.fn(),
-    search: vi.fn()
+    search: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
   };
 
   return {
