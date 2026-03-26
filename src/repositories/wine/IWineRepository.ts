@@ -48,4 +48,7 @@ export interface IWineRepository {
   }): Promise<Wine | null>;
   create(input: Prisma.WineUncheckedCreateInput): Promise<WineWithRelations>;
   search(query: string): Promise<WineWithRelations[]>;
+
+  update(id: string, input: Partial<Prisma.WineUncheckedUpdateInput>): Promise<WineWithRelations>;
+  delete(id: string): Promise<void>;
 }
