@@ -22,12 +22,22 @@ export const createWine = async (req: Request, res: Response) => {
   }
 };
 
+
 export const updateWine = async (req: Request, res: Response) => {
-  // TODO: Implement update logic
-  res.json({ message: 'Update wine - not implemented' });
+  try {
+    const wine = await adminWineService.updateWine(req.params.id, req.body);
+    res.json(wine);
+  } catch (err) {
+    res.status(400).json({ error: 'Failed to update wine', details: err instanceof Error ? err.message : err });
+  }
 };
 
+
 export const deleteWine = async (req: Request, res: Response) => {
-  // TODO: Implement delete logic
-  res.json({ message: 'Delete wine - not implemented' });
+  try {
+    await adminWineService.deleteWine(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    res.status(400).json({ error: 'Failed to delete wine', details: err instanceof Error ? err.message : err });
+  }
 };
