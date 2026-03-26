@@ -14,11 +14,29 @@
     where: { id }
   });
 }
+
 import type { PrismaClient, Prisma } from "@prisma/client";
 import type { IWineRepository, WineListFilters } from "@/repositories/wine/IWineRepository";
 
 export class WineRepository implements IWineRepository {
   public constructor(private readonly prisma: PrismaClient) { }
+
+  public async update(id: string, input: Partial<Prisma.WineUncheckedUpdateInput>) {
+    return this.prisma.wine.update({
+      where: { id },
+      data: input,
+      include: {
+        winery: true,
+        region: true
+      }
+    });
+  }
+
+  public async delete(id: string) {
+    await this.prisma.wine.delete({
+      where: { id }
+    });
+  }
 
   public async findMany(filters: WineListFilters) {
     const variationWhere = this.buildVariationWhere(filters);
