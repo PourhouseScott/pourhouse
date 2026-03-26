@@ -143,27 +143,27 @@ describe('adminWineController', () => {
   });
 
   it('should update wine with valid input', async () => {
-    const req = { params: { id: '1' }, body: { name: 'Updated' } } as unknown as Request;
+    const req = { params: { id: '1' }, body: { name: 'Updated', slug: 'updated' } } as unknown as Request;
     const res = mockRes();
     const wine = { id: '1', name: 'Updated' };
-    adminWineService.updateWine.mockResolvedValue(wine);
+    service.updateWine.mockResolvedValue(wine);
     await adminWineController.updateWine(req, res);
     expect(res.json).toHaveBeenCalledWith(wine);
   });
 
   it('should handle non-Zod error in updateWine', async () => {
-    const req = { params: { id: '1' }, body: { name: 'Updated' } } as unknown as Request;
+    const req = { params: { id: '1' }, body: { name: 'Updated', slug: 'updated' } } as unknown as Request;
     const res = mockRes();
-    adminWineService.updateWine.mockRejectedValue(new Error('fail'));
+    service.updateWine.mockRejectedValue(new Error('fail'));
     await adminWineController.updateWine(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to update wine' }));
   });
 
   it('should handle non-Error object in updateWine else branch', async () => {
-    const req = { params: { id: '1' }, body: { name: 'Updated' } } as unknown as Request;
+    const req = { params: { id: '1' }, body: { name: 'Updated', slug: 'updated' } } as unknown as Request;
     const res = mockRes();
-    adminWineService.updateWine.mockRejectedValue(12345);
+    service.updateWine.mockRejectedValue(12345);
     await adminWineController.updateWine(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to update wine', details: 12345 }));
@@ -180,7 +180,7 @@ describe('adminWineController', () => {
   it('should delete wine', async () => {
     const req = { params: { id: '1' } } as unknown as Request;
     const res = mockRes();
-    adminWineService.deleteWine.mockResolvedValue(undefined);
+    service.deleteWine.mockResolvedValue(undefined);
     await adminWineController.deleteWine(req, res);
     expect(res.status).toHaveBeenCalledWith(204);
     expect(res.send).toHaveBeenCalled();
@@ -189,7 +189,7 @@ describe('adminWineController', () => {
   it('should handle error in deleteWine', async () => {
     const req = { params: { id: '1' } } as unknown as Request;
     const res = mockRes();
-    adminWineService.deleteWine.mockRejectedValue(new Error('fail'));
+    service.deleteWine.mockRejectedValue(new Error('fail'));
     await adminWineController.deleteWine(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to delete wine' }));
@@ -198,7 +198,7 @@ describe('adminWineController', () => {
   it('should handle non-Error object in deleteWine else branch', async () => {
     const req = { params: { id: '1' } } as unknown as Request;
     const res = mockRes();
-    adminWineService.deleteWine.mockRejectedValue({ foo: 'bar' });
+    service.deleteWine.mockRejectedValue({ foo: 'bar' });
     await adminWineController.deleteWine(req, res);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: 'Failed to delete wine', details: { foo: 'bar' } }));

@@ -21,10 +21,11 @@ export const createWine = async (req: Request, res: Response) => {
   try {
     const parsed = createWineSchema.parse(req.body);
     // Ensure slug is present (required by Prisma)
-    if (!parsed.slug) {
-      parsed.slug = parsed.name.toLowerCase().replace(/\s+/g, '-');
-    }
-    const wine = await adminWineService.createWine(parsed);
+    const wineInput = {
+      ...parsed,
+      slug: parsed.slug ?? parsed.name.toLowerCase().replace(/\s+/g, '-')
+    };
+    const wine = await adminWineService.createWine(wineInput);
     res.status(201).json(wine);
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -43,7 +44,9 @@ export const updateWine = async (req: Request, res: Response) => {
   try {
     // Allow partial updates: use .partial() on the schema
     const parsed = createWineSchema.partial().parse(req.body);
-    const wine = await adminWineService.updateWine(String(req.params.id), parsed);
+    // Remove undefined properties for Prisma update
+    const updateInput = Object.fromEntries(Object.entries(parsed).filter(([_, v]) => v !== undefined));
+    const wine = await adminWineService.updateWine(String(req.params.id), updateInput);
     res.json(wine);
   } catch (err) {
     if (err instanceof z.ZodError) {
