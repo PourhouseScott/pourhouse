@@ -1,6 +1,9 @@
 
 import { Request, Response } from 'express';
+
 import { adminWineService } from './_adminWineControllerDeps';
+import { createWineSchema } from '../models/validation';
+import { z } from 'zod';
 
 
 export const listWines = async (req: Request, res: Response) => {
@@ -13,22 +16,33 @@ export const listWines = async (req: Request, res: Response) => {
 };
 
 
-export const createWine = async (req: Request, res: Response) => {
+
   try {
-    const wine = await adminWineService.createWine(req.body);
+    const parsed = createWineSchema.parse(req.body);
+    const wine = await adminWineService.createWine(parsed);
     res.status(201).json(wine);
   } catch (err) {
-    res.status(400).json({ error: 'Failed to create wine', details: err instanceof Error ? err.message : err });
+    if (err instanceof z.ZodError) {
+      res.status(422).json({ error: 'Validation failed', details: err.errors });
+    } else {
+      res.status(400).json({ error: 'Failed to create wine', details: err instanceof Error ? err.message : err });
+    }
   }
 };
 
 
-export const updateWine = async (req: Request, res: Response) => {
+
   try {
-    const wine = await adminWineService.updateWine(req.params.id, req.body);
+    // Allow partial updates: use .partial() on the schema
+    const parsed = createWineSchema.partial().parse(req.body);
+    const wine = await adminWineService.updateWine(req.params.id, parsed);
     res.json(wine);
   } catch (err) {
-    res.status(400).json({ error: 'Failed to update wine', details: err instanceof Error ? err.message : err });
+    if (err instanceof z.ZodError) {
+      res.status(422).json({ error: 'Validation failed', details: err.errors });
+    } else {
+      res.status(400).json({ error: 'Failed to update wine', details: err instanceof Error ? err.message : err });
+    }
   }
 };
 
