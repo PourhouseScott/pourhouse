@@ -1,13 +1,25 @@
+
 import { Request, Response } from 'express';
+import { adminWineService } from './_adminWineControllerDeps';
+
 
 export const listWines = async (req: Request, res: Response) => {
-  // TODO: Implement list logic
-  res.json({ message: 'List wines - not implemented' });
+  try {
+    const wines = await adminWineService.listWines();
+    res.json(wines);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to list wines', details: err instanceof Error ? err.message : err });
+  }
 };
 
+
 export const createWine = async (req: Request, res: Response) => {
-  // TODO: Implement create logic
-  res.json({ message: 'Create wine - not implemented' });
+  try {
+    const wine = await adminWineService.createWine(req.body);
+    res.status(201).json(wine);
+  } catch (err) {
+    res.status(400).json({ error: 'Failed to create wine', details: err instanceof Error ? err.message : err });
+  }
 };
 
 export const updateWine = async (req: Request, res: Response) => {
