@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as adminWineController from './adminWineController';
 import { adminWineService } from '@/controllers/_adminWineControllerDeps';
+import { createWineSchema } from '../models/validation';
 import { Request, Response } from 'express';
 
 
@@ -37,20 +38,26 @@ describe('adminWineController', () => {
   });
 
   it('should create wine with valid input', async () => {
-    const req = {
-      body: {
-        name: 'Wine',
-        vintage: 2020,
-        wineryId: '11111111-1111-1111-1111-111111111111',
-        regionId: '22222222-2222-2222-2222-222222222222',
-        country: 'US',
-        grapeVarieties: ['Cabernet'],
-        alcoholPercent: 13.5,
-        description: 'desc',
-        imageUrl: 'http://img.com',
-        squareItemId: 'sqid'
-      }
-    } as unknown as Request;
+    const input = {
+      name: 'Wine',
+      vintage: 2020,
+      wineryId: '11111111-1111-1111-1111-111111111111',
+      regionId: '22222222-2222-2222-2222-222222222222',
+      country: 'US',
+      grapeVarieties: ['Cabernet'],
+      alcoholPercent: 13.5,
+      description: 'desc',
+      imageUrl: 'http://img.com',
+      squareItemId: 'sqid'
+    };
+    // Zod validation debug
+    try {
+      createWineSchema.parse(input);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Zod validation error in test:', err);
+    }
+    const req = { body: input } as unknown as Request;
     const res = mockRes();
     const wine = { id: '1', name: 'Wine' };
     adminWineService.createWine.mockResolvedValue(wine);
