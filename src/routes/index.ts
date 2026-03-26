@@ -3,7 +3,9 @@ import authRoutes from "./authRoutes";
 import flightRoutes from "./flightRoutes";
 import inventoryRoutes from "./inventoryRoutes";
 import ratingRoutes from "./ratingRoutes";
+
 import wineRoutes from "./wineRoutes";
+import adminWineRoutes from "./adminWineRoutes";
 
 const router = Router();
 
@@ -13,6 +15,7 @@ router.get("/health", (_req, res) => {
 
 router.use("/auth", authRoutes);
 router.use("/wines", wineRoutes);
+router.use("/admin/wines", adminWineRoutes);
 router.use("/inventory", inventoryRoutes);
 router.use("/ratings", ratingRoutes);
 router.use("/flights", flightRoutes);
