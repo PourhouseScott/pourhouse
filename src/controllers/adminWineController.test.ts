@@ -87,6 +87,34 @@ describe('adminWineController', () => {
     expect(res.json).toHaveBeenCalledWith(wine);
   });
 
+  it('should preserve provided slug and default squareItemId to null', async () => {
+    const req = { body: { name: 'Ignored by mocked parse' } } as unknown as Request;
+    const res = mockRes();
+    const parsedWithSlug = {
+      name: 'Wine Name',
+      slug: 'provided-slug',
+      vintage: 2020,
+      wineryId: '550e8400-e29b-41d4-a716-446655440000',
+      regionId: '123e4567-e89b-12d3-a456-426614174000',
+      country: 'US',
+      grapeVarieties: ['Cabernet'],
+      alcoholPercent: 13.5,
+      description: 'desc',
+      imageUrl: 'http://img.com'
+    };
+    const parseSpy = vi.spyOn(createWineSchema, 'parse').mockReturnValue(parsedWithSlug as any);
+    const wine = { id: '1', name: 'Wine Name' };
+    service.createWine.mockResolvedValue(wine);
+
+    await adminWineController.createWine(req, res);
+
+    expect(service.createWine).toHaveBeenCalledWith(expect.objectContaining({
+      slug: 'provided-slug',
+      squareItemId: null
+    }));
+    parseSpy.mockRestore();
+  });
+
   it('should handle non-Zod error in createWine', async () => {
     const req = { body: { name: 'Wine' } } as unknown as Request;
     const res = mockRes();

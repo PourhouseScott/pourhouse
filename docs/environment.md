@@ -25,6 +25,7 @@ cp .env.example .env
 | `DATABASE_URL` | Yes | — | PostgreSQL connection string. Example: `postgresql://postgres:postgres@localhost:5432/pourhouse?schema=public` |
 | `JWT_SECRET` | Yes | — | Secret used to sign and verify JWTs. Must be at least 16 characters. |
 | `JWT_EXPIRES_IN` | No | `7d` | JWT expiry duration in [vercel/ms](https://github.com/vercel/ms) format (e.g. `7d`, `1h`, `30m`). |
+| `ADMIN_API_TOKEN` | Yes | — | Shared bearer token required for all `/api/admin/*` endpoints. Must be at least 24 characters. |
 | `SQUARE_ACCESS_TOKEN` | Yes | — | Access token used for Square catalog API requests and sync operations. |
 | `SQUARE_ENVIRONMENT` | No | `production` | Square environment selector. Accepted values: `sandbox`, `production`. |
 

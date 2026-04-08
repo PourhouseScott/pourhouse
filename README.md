@@ -106,6 +106,7 @@ Use `.env.example` as a template:
 - `DATABASE_URL`
 - `JWT_SECRET`
 - `JWT_EXPIRES_IN`
+- `ADMIN_API_TOKEN`
 - `SQUARE_ACCESS_TOKEN`
 - `SQUARE_ENVIRONMENT`
 
@@ -145,6 +146,15 @@ You can also run individual steps as needed.
 - `POST /api/wines` - creates a wine and generates its slug from `name` + `vintage`
 - `GET /api/wines/search?q=term`
 - `GET /api/wines/:id/ratings`
+
+### Admin Wines
+
+Admin routes require `Authorization: Bearer <ADMIN_API_TOKEN>`.
+
+- `GET /api/admin/wines`
+- `POST /api/admin/wines`
+- `PUT /api/admin/wines/:id`
+- `DELETE /api/admin/wines/:id`
 
 Supported `GET /api/wines` query params:
 

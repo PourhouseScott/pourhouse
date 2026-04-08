@@ -9,6 +9,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   JWT_SECRET: z.string().min(16, "JWT_SECRET must be at least 16 characters"),
   JWT_EXPIRES_IN: z.string().default("7d"),
+  ADMIN_API_TOKEN: z.string().min(24, "ADMIN_API_TOKEN must be at least 24 characters"),
   SQUARE_ACCESS_TOKEN: z.string().min(1, "SQUARE_ACCESS_TOKEN is required"),
   SQUARE_ENVIRONMENT: z.enum(["sandbox", "production"]).default("production")
 });

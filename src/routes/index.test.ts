@@ -43,4 +43,11 @@ describe("routes index", () => {
     expect(response.headers["content-type"]).toContain("javascript");
     expect(response.text).toContain("createPourhouseWineListEmbed");
   });
+
+  it("blocks unauthorized access to admin wine routes", async () => {
+    const response = await request(app).get("/api/admin/wines");
+
+    expect(response.status).toBe(401);
+    expect(response.body).toEqual({ message: "Unauthorized" });
+  });
 });

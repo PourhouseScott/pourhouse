@@ -20,23 +20,17 @@ export class AdminWineService implements IAdminWineService {
   }
 
   async updateWine(id: string, input: Partial<Prisma.WineUncheckedUpdateInput>) {
-    // Only allow updating fields that are present in input
-    // (Assume WineRepository has a method for update, otherwise use prisma directly)
-    // For now, use prisma directly for update
-    // @ts-ignore
-    if (!('update' in this.wineRepository)) {
+    // Guard against repos that don't implement write operations.
+    if (typeof (this.wineRepository as any).update !== 'function') {
       throw new Error('Update not implemented in repository');
     }
-    // @ts-ignore
-    return this.wineRepository.update(id, input);
+    return (this.wineRepository as any).update(id, input);
   }
 
   async deleteWine(id: string) {
-    // @ts-ignore
-    if (!('delete' in this.wineRepository)) {
+    if (typeof (this.wineRepository as any).delete !== 'function') {
       throw new Error('Delete not implemented in repository');
     }
-    // @ts-ignore
-    return this.wineRepository.delete(id);
+    return (this.wineRepository as any).delete(id);
   }
 }
