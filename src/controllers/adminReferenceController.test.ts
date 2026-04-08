@@ -49,4 +49,22 @@ describe("adminReferenceController", () => {
       details: "boom"
     });
   });
+
+  it("returns 500 with non-Error details when rejected value is not an Error", async () => {
+    const res = {
+      json: vi.fn(),
+      status: vi.fn().mockReturnThis()
+    } as unknown as Response;
+
+    vi.mocked(adminReferenceService.listRegions).mockRejectedValue("service down");
+    vi.mocked(adminReferenceService.listWineries).mockResolvedValue([]);
+
+    await adminReferenceController.listAdminWineOptions({} as Request, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({
+      error: "Failed to load admin wine options",
+      details: "service down"
+    });
+  });
 });
