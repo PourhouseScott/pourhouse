@@ -15,21 +15,14 @@
     <section class="hero-panel">
       <p class="eyebrow">Pourhouse Wine Co. Admin</p>
       <h1>Wine management, without touching the database.</h1>
-      <p class="hero-copy">Use the admin token to load the current catalog, edit wine records, create new entries, and remove outdated ones.</p>
+      <p class="hero-copy">Sign in with Google to load the current catalog, edit wine records, create new entries, and remove outdated ones.</p>
 
-      <form class="token-form" id="admin-token-form">
-        <label class="field-label" for="admin-token">Admin API token</label>
-        <div class="token-row">
-          <input id="admin-token" name="admin-token" type="password" autocomplete="off" placeholder="Paste bearer token" required>
-          <button type="submit" class="button button--primary">Load workspace</button>
-        </div>
-        <label class="checkbox-row">
-          <input id="remember-token" type="checkbox">
-          <span>Remember token on this browser</span>
-        </label>
-      </form>
+      <div class="auth-actions">
+        <button type="button" class="button button--primary" id="google-signin">Sign in with Google</button>
+        <button type="button" class="button button--ghost" id="signout">Sign out</button>
+      </div>
 
-      <div class="status-banner" id="admin-status" role="status" aria-live="polite">Waiting for admin token.</div>
+      <div class="status-banner" id="admin-status" role="status" aria-live="polite">Sign in to continue.</div>
     </section>
 
     <section class="workspace-grid">

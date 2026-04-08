@@ -138,6 +138,8 @@ You can also run individual steps as needed.
 
 ### Auth
 
+- `GET /api/auth/google/start` - redirects browser to Google OAuth consent
+- `GET /api/auth/google/callback` - exchanges Google code and redirects back with app JWT
 - `POST /api/auth/google`
 
 ### Wines
@@ -153,6 +155,7 @@ You can also run individual steps as needed.
 ### Admin Wines
 
 Admin routes require `Authorization: Bearer <app-jwt>`, and the authenticated user must have `role=ADMIN` in the database.
+The admin UI at `/admin/wines` now uses Google sign-in and stores the app JWT in browser local storage.
 
 - `GET /api/admin/wines`
 - `POST /api/admin/wines`

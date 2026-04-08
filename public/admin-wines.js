@@ -1,9 +1,10 @@
 /* global document, window, HTMLElement */
 
-const STORAGE_KEY = "pourhouse.adminToken"
+const STORAGE_KEY = "pourhouse.adminJwt"
 
 const state = {
   token: "",
+  userEmail: "",
   wines: [],
   filteredWines: [],
   regions: [],
@@ -13,9 +14,8 @@ const state = {
 }
 
 const elements = {
-  tokenForm: document.getElementById("admin-token-form"),
-  tokenInput: document.getElementById("admin-token"),
-  rememberToken: document.getElementById("remember-token"),
+  signInButton: document.getElementById("google-signin"),
+  signOutButton: document.getElementById("signout"),
   status: document.getElementById("admin-status"),
   editorTitle: document.getElementById("editor-title"),
   wineForm: document.getElementById("wine-form"),
@@ -53,6 +53,85 @@ function setStatus(message, tone = "neutral") {
   if (tone === "success") {
     elements.status.classList.add("is-success")
   }
+}
+
+function decodeTokenPayload(token) {
+  const tokenParts = String(token || "").split(".")
+  if (tokenParts.length < 2) {
+    return null
+  }
+
+  try {
+    const base64 = tokenParts[1].replace(/-/g, "+").replace(/_/g, "/")
+    const decoded = window.atob(base64)
+    return JSON.parse(decoded)
+  } catch {
+    return null
+  }
+}
+
+function setAuthUiState() {
+  if (elements.signInButton) {
+    elements.signInButton.disabled = Boolean(state.token)
+  }
+
+  if (elements.signOutButton) {
+    elements.signOutButton.disabled = !state.token
+  }
+}
+
+function persistSession(token) {
+  state.token = token
+  const payload = decodeTokenPayload(token)
+  state.userEmail = typeof payload?.email === "string" ? payload.email : ""
+  window.localStorage.setItem(STORAGE_KEY, token)
+  setAuthUiState()
+}
+
+function clearSession() {
+  state.token = ""
+  state.userEmail = ""
+  window.localStorage.removeItem(STORAGE_KEY)
+  setAuthUiState()
+}
+
+function sanitizePath(pathValue) {
+  const value = String(pathValue || "").trim()
+  if (!value.startsWith("/") || value.startsWith("//")) {
+    return "/admin/wines"
+  }
+
+  return value
+}
+
+function removeAuthQueryFlags() {
+  const nextUrl = new URL(window.location.href)
+  nextUrl.searchParams.delete("authError")
+  window.history.replaceState({}, "", `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`)
+}
+
+function initializeAuthFromUrl() {
+  const currentUrl = new URL(window.location.href)
+  const hashParams = new URLSearchParams(currentUrl.hash.replace(/^#/, ""))
+  const tokenFromHash = hashParams.get("token")
+
+  if (tokenFromHash) {
+    persistSession(tokenFromHash)
+    currentUrl.hash = ""
+    window.history.replaceState({}, "", `${currentUrl.pathname}${currentUrl.search}`)
+    return { hadTokenInHash: true }
+  }
+
+  const authError = currentUrl.searchParams.get("authError")
+  if (authError === "missing_code") {
+    setStatus("Google sign-in did not return an authorization code. Try again.", "error")
+    removeAuthQueryFlags()
+  } else if (authError === "google_auth_failed") {
+    setStatus("Google sign-in failed. Please try again.", "error")
+    removeAuthQueryFlags()
+  }
+
+  return { hadTokenInHash: false }
 }
 
 function setLoading(isLoading) {
@@ -120,6 +199,11 @@ function applySearchFilter() {
 
 function renderWineList() {
   if (!elements.wineList) {
+    return
+  }
+
+  if (!state.token) {
+    elements.wineList.innerHTML = '<p class="empty-state">Sign in with Google to load the admin workspace.</p>'
     return
   }
 
@@ -266,7 +350,12 @@ async function handleApiError(response) {
   }
 
   if (response.status === 401) {
-    throw new Error("Unauthorized. Confirm the admin token and try again.")
+    clearSession()
+    throw new Error("You are signed out. Sign in with Google to continue.")
+  }
+
+  if (response.status === 403) {
+    throw new Error("Signed in, but your account does not have admin access.")
   }
 
   const details = payload?.details
@@ -280,7 +369,7 @@ async function handleApiError(response) {
 
 async function loadAdminBootstrap() {
   if (!state.token) {
-    setStatus("Enter an admin token to continue.", "error")
+    setStatus("Sign in with Google to continue.", "error")
     return
   }
 
@@ -310,7 +399,8 @@ async function loadAdminBootstrap() {
     renderSelectOptions(elements.wineryId, state.wineries, "Choose winery")
     renderSelectOptions(elements.regionId, state.regions, "Choose region")
     renderWineList()
-    setStatus(`Loaded ${state.wines.length} wines.`, "success")
+    const identity = state.userEmail ? `Signed in as ${state.userEmail}. ` : ""
+    setStatus(`${identity}Loaded ${state.wines.length} wines.`, "success")
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to load admin data."
     setStatus(message, "error")
@@ -323,7 +413,7 @@ async function saveWine(event) {
   event.preventDefault()
 
   if (!state.token) {
-    setStatus("Enter an admin token to save changes.", "error")
+    setStatus("Sign in with Google before saving changes.", "error")
     return
   }
 
@@ -359,7 +449,7 @@ async function saveWine(event) {
 
 async function deleteWineById(wineId) {
   if (!state.token) {
-    setStatus("Enter an admin token to delete wines.", "error")
+    setStatus("Sign in with Google before deleting wines.", "error")
     return
   }
 
@@ -440,36 +530,27 @@ function handleWineListClick(event) {
 
 function restoreToken() {
   const savedToken = window.localStorage.getItem(STORAGE_KEY)
-  if (!savedToken || !elements.tokenInput) {
+  if (!savedToken) {
     return
   }
 
-  state.token = savedToken
-  elements.tokenInput.value = savedToken
-  if (elements.rememberToken) {
-    elements.rememberToken.checked = true
-  }
+  persistSession(savedToken)
 }
 
 function bindEvents() {
-  elements.tokenForm?.addEventListener("submit", (event) => {
-    event.preventDefault()
+  elements.signInButton?.addEventListener("click", () => {
+    const returnTo = sanitizePath(window.location.pathname || "/admin/wines")
+    const targetUrl = `/api/auth/google/start?returnTo=${encodeURIComponent(returnTo)}`
+    window.location.assign(targetUrl)
+  })
 
-    const nextToken = elements.tokenInput?.value.trim() || ""
-    if (!nextToken) {
-      setStatus("Admin token is required.", "error")
-      return
-    }
-
-    state.token = nextToken
-
-    if (elements.rememberToken?.checked) {
-      window.localStorage.setItem(STORAGE_KEY, nextToken)
-    } else {
-      window.localStorage.removeItem(STORAGE_KEY)
-    }
-
-    void loadAdminBootstrap()
+  elements.signOutButton?.addEventListener("click", () => {
+    clearSession()
+    resetForm()
+    state.wines = []
+    state.filteredWines = []
+    renderWineList()
+    setStatus("You have been signed out.", "success")
   })
 
   elements.wineForm?.addEventListener("submit", saveWine)
@@ -489,10 +570,14 @@ function bindEvents() {
   elements.wineList?.addEventListener("click", handleWineListClick)
 }
 
+setAuthUiState()
+const { hadTokenInHash } = initializeAuthFromUrl()
 restoreToken()
 bindEvents()
 resetForm()
 
 if (state.token) {
   void loadAdminBootstrap()
+} else if (!hadTokenInHash) {
+  setStatus("Sign in with Google to continue.")
 }

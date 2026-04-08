@@ -113,29 +113,12 @@ h1 {
   line-height: 1.65;
 }
 
-.token-form {
+.auth-actions {
   position: relative;
   z-index: 1;
   margin-top: 28px;
-}
-
-.token-row {
   display: flex;
   gap: 12px;
-  margin-top: 10px;
-}
-
-.token-row input {
-  flex: 1;
-}
-
-.checkbox-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-  color: var(--ink-soft);
-  font-size: 0.95rem;
 }
 
 .status-banner {
@@ -398,6 +381,7 @@ textarea {
   }
 
   .token-row,
+  .auth-actions,
   .form-actions,
   .panel-heading,
   .wine-card__header,
@@ -416,7 +400,7 @@ textarea {
 
   .card-actions .button,
   .form-actions .button,
-  .token-row .button {
+  .auth-actions .button {
     width: 100%;
   }
 }
