@@ -21,14 +21,34 @@ describe("adminReferenceController", () => {
       status: vi.fn().mockReturnThis()
     } as unknown as Response;
 
-    vi.mocked(adminReferenceService.listRegions).mockResolvedValue([{ id: "region-1", name: "Okanagan" }]);
-    vi.mocked(adminReferenceService.listWineries).mockResolvedValue([{ id: "winery-1", name: "Lightning Rock" }]);
+    vi.mocked(adminReferenceService.listRegions).mockResolvedValue([
+      { id: "region-1", name: "Okanagan", parentId: null }
+    ]);
+    vi.mocked(adminReferenceService.listWineries).mockResolvedValue([
+      {
+        id: "winery-1",
+        name: "Lightning Rock",
+        regionId: "region-1",
+        country: "Canada",
+        website: "https://example.com",
+        description: "Estate producer"
+      }
+    ]);
 
     await adminReferenceController.listAdminWineOptions({} as Request, res);
 
     expect(res.json).toHaveBeenCalledWith({
-      regions: [{ id: "region-1", name: "Okanagan" }],
-      wineries: [{ id: "winery-1", name: "Lightning Rock" }]
+      regions: [{ id: "region-1", name: "Okanagan", parentId: null }],
+      wineries: [
+        {
+          id: "winery-1",
+          name: "Lightning Rock",
+          regionId: "region-1",
+          country: "Canada",
+          website: "https://example.com",
+          description: "Estate producer"
+        }
+      ]
     });
   });
 

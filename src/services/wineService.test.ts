@@ -27,10 +27,12 @@ function createService() {
   };
 
   const wineryRepository: IWineryRepository = {
+    findMany: vi.fn(),
     findById: vi.fn()
   };
 
   const regionRepository: IRegionRepository = {
+    findMany: vi.fn(),
     findById: vi.fn()
   };
 
