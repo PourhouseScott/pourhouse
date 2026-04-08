@@ -4,6 +4,10 @@ import type { IUserRepository } from "@/repositories/user/IUserRepository";
 export class UserRepository implements IUserRepository {
   public constructor(private readonly prisma: PrismaClient) { }
 
+  public async findById(id: string) {
+    return this.prisma.user.findUnique({ where: { id } });
+  }
+
   public async findByEmail(email: string) {
     return this.prisma.user.findUnique({ where: { email } });
   }
@@ -24,6 +28,16 @@ export class UserRepository implements IUserRepository {
         authProvider: "GOOGLE",
         name: input.name
       }
+    });
+  }
+
+  public async updateRoleByEmail(input: {
+    email: string;
+    role: "USER" | "ADMIN";
+  }) {
+    return this.prisma.user.update({
+      where: { email: input.email },
+      data: { role: input.role }
     });
   }
 

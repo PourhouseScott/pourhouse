@@ -87,6 +87,8 @@ API runs at `http://localhost:4000` by default.
 - `npm run square:seed:sandbox` - seed sample catalog items into Square sandbox (safe-guarded to sandbox env)
 - `npm run square:sync:wines` - sync Square catalog wines into the database
 - `npm run seed:sample:data` - seed local DB, seed Square sandbox catalog, then sync Square data into local wines
+- `npm run admin:grant -- <email>` - grant admin role to an existing user
+- `npm run admin:revoke -- <email>` - revoke admin role from a user
 - `npm run prisma:generate` - generate Prisma client
 - `npm run prisma:migrate` - run migrations in development
 - `npm run prisma:seed` - seed sample data
@@ -106,7 +108,9 @@ Use `.env.example` as a template:
 - `DATABASE_URL`
 - `JWT_SECRET`
 - `JWT_EXPIRES_IN`
-- `ADMIN_API_TOKEN`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI`
 - `SQUARE_ACCESS_TOKEN`
 - `SQUARE_ENVIRONMENT`
 
@@ -134,8 +138,7 @@ You can also run individual steps as needed.
 
 ### Auth
 
-- `POST /api/auth/register`
-- `POST /api/auth/login`
+- `POST /api/auth/google`
 
 ### Wines
 
@@ -149,7 +152,7 @@ You can also run individual steps as needed.
 
 ### Admin Wines
 
-Admin routes require `Authorization: Bearer <ADMIN_API_TOKEN>`.
+Admin routes require `Authorization: Bearer <app-jwt>`, and the authenticated user must have `role=ADMIN` in the database.
 
 - `GET /api/admin/wines`
 - `POST /api/admin/wines`

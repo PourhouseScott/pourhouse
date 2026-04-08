@@ -12,6 +12,11 @@ enum AuthProvider {
   GOOGLE
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 enum ServingMode {
   BOTTLE_750ML
   GLASS_5OZ
@@ -200,6 +205,7 @@ model User {
   password     String?
   name         String
   authProvider AuthProvider @default(LOCAL)
+  role         UserRole     @default(USER)
   googleSubject String?     @unique
   createdAt    DateTime     @default(now())
 

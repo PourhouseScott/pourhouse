@@ -16,6 +16,8 @@
     "square:seed:sandbox": "tsx -r tsconfig-paths/register scripts/seedSquareSandboxCatalog.ts",
     "square:sync:wines": "tsx -r tsconfig-paths/register scripts/syncSquareCatalogToWines.ts",
     "seed:sample:data": "tsx -r tsconfig-paths/register scripts/seedSampleData.ts",
+    "admin:grant": "tsx -r tsconfig-paths/register scripts/setUserRole.ts ADMIN",
+    "admin:revoke": "tsx -r tsconfig-paths/register scripts/setUserRole.ts USER",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts",

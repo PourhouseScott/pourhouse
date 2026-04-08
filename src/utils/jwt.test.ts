@@ -5,7 +5,8 @@ describe("jwt utils", () => {
   it("signs and verifies a token payload", () => {
     const payload = {
       userId: "user-1",
-      email: "user@example.com"
+      email: "user@example.com",
+      role: "USER" as const
     };
 
     const token = signToken(payload);

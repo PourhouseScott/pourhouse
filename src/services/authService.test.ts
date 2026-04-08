@@ -12,9 +12,11 @@ function createGoogleAuthClientMock(): IGoogleAuthClient {
 
 function createUserRepositoryMock(): IUserRepository {
   return {
+    findById: vi.fn(),
     findByEmail: vi.fn(),
     findByGoogleSubject: vi.fn(),
     updateGoogleIdentityById: vi.fn(),
+    updateRoleByEmail: vi.fn(),
     create: vi.fn()
   };
 }
@@ -42,6 +44,7 @@ describe("AuthService", () => {
       password: null,
       name: "User",
       authProvider: "GOOGLE",
+      role: "ADMIN",
       googleSubject: "google-sub-1",
       createdAt,
       ratings: []
@@ -81,6 +84,7 @@ describe("AuthService", () => {
       password: "legacy",
       name: "Old Name",
       authProvider: "LOCAL",
+      role: "USER",
       googleSubject: null,
       createdAt,
       ratings: []
@@ -91,6 +95,7 @@ describe("AuthService", () => {
       password: "legacy",
       name: "Updated Name",
       authProvider: "GOOGLE",
+      role: "USER",
       googleSubject: "google-sub-2",
       createdAt,
       ratings: []
@@ -138,6 +143,7 @@ describe("AuthService", () => {
       password: null,
       name: "New User",
       authProvider: "GOOGLE",
+      role: "USER",
       googleSubject: "google-sub-3",
       createdAt,
       ratings: []
@@ -150,6 +156,7 @@ describe("AuthService", () => {
       password: null,
       name: "New User",
       authProvider: "GOOGLE",
+      role: "USER",
       googleSubject: "google-sub-3"
     });
     expect(result.user).toEqual({

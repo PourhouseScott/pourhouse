@@ -2,6 +2,23 @@ import { describe, expect, it, vi } from "vitest";
 import { UserRepository } from "@/repositories/user/UserRepository";
 
 describe("UserRepository", () => {
+  it("findById queries the user by id", async () => {
+    const findUnique = vi.fn().mockResolvedValue(null);
+    const prisma = {
+      user: {
+        findUnique
+      }
+    } as never;
+
+    const repository = new UserRepository(prisma);
+
+    await repository.findById("user-1");
+
+    expect(findUnique).toHaveBeenCalledWith({
+      where: { id: "user-1" }
+    });
+  });
+
   it("findByEmail queries the user by email", async () => {
     const findUnique = vi.fn().mockResolvedValue(null);
     const prisma = {
@@ -59,6 +76,27 @@ describe("UserRepository", () => {
         authProvider: "GOOGLE",
         name: "Updated Name"
       }
+    });
+  });
+
+  it("updateRoleByEmail updates the user's role", async () => {
+    const update = vi.fn().mockResolvedValue(null);
+    const prisma = {
+      user: {
+        update
+      }
+    } as never;
+
+    const repository = new UserRepository(prisma);
+
+    await repository.updateRoleByEmail({
+      email: "admin@example.com",
+      role: "ADMIN"
+    });
+
+    expect(update).toHaveBeenCalledWith({
+      where: { email: "admin@example.com" },
+      data: { role: "ADMIN" }
     });
   });
 

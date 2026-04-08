@@ -40,7 +40,7 @@ describe("RatingController", () => {
 
     const controller = new RatingController(ratingService);
     const req = {
-      user: { id: "user-1", email: "u@example.com" },
+      user: { id: "user-1", email: "u@example.com", role: "USER" },
       body: { wineId: "w1", rating: 4, notes: "Great" }
     } as unknown as Request;
     const res = createResponse();

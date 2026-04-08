@@ -114,7 +114,8 @@ export class AuthService {
 
     const token = signToken({
       userId: user.id,
-      email: user.email
+      email: user.email,
+      role: user.role
     });
 
     return {
@@ -148,6 +149,7 @@ export class AuthService {
       password: null,
       name: identity.name,
       authProvider: "GOOGLE",
+      role: "USER",
       googleSubject: identity.googleSubject
     });
   }

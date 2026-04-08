@@ -4,7 +4,6 @@ process.env.PORT ??= "4000";
 process.env.DATABASE_URL ??= "postgresql://test:test@localhost:5432/pourhouse_test?schema=public";
 process.env.JWT_SECRET ??= "test-secret-123456";
 process.env.JWT_EXPIRES_IN ??= "7d";
-process.env.ADMIN_API_TOKEN ??= "test-admin-token-1234567890";
 process.env.GOOGLE_CLIENT_ID ??= "google-client-id-test";
 process.env.GOOGLE_CLIENT_SECRET ??= "google-client-secret-test";
 process.env.GOOGLE_REDIRECT_URI ??= "http://localhost:4000/auth/google/callback";

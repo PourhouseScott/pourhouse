@@ -33,7 +33,8 @@ describe("authMiddleware", () => {
 
     vi.spyOn(jwtUtils, "verifyToken").mockReturnValue({
       userId: "user-1",
-      email: "user@example.com"
+      email: "user@example.com",
+      role: "USER"
     });
 
     authMiddleware(req, {} as Response, next);
@@ -41,7 +42,8 @@ describe("authMiddleware", () => {
     expect(jwtUtils.verifyToken).toHaveBeenCalledWith("token-123");
     expect(req.user).toEqual({
       id: "user-1",
-      email: "user@example.com"
+      email: "user@example.com",
+      role: "USER"
     });
     expect(next).toHaveBeenCalledTimes(1);
   });
