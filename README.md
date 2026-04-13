@@ -47,10 +47,6 @@ For prerequisites, local environment setup, database migration flow, and sample-
 - [Squarespace Integration Runbook](docs/squarespace-integration.md)
 - [Square Data Structure and Integration Model](docs/square-integration-model.md)
 
-## Scripts and Environment
-
-For the full scripts reference and environment variable setup, see [Development Setup](docs/development-setup.md) and [Environment Configuration](docs/environment.md).
-
 ## Scheduled Square Sync
 
 The API supports a background scheduler that fetches Square catalog data and syncs it into local wines/inventory.
