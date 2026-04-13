@@ -47,52 +47,9 @@ For prerequisites, local environment setup, database migration flow, and sample-
 - [Squarespace Integration Runbook](docs/squarespace-integration.md)
 - [Square Data Structure and Integration Model](docs/square-integration-model.md)
 
-## Scripts
+## Scripts and Environment
 
-- `npm run dev` - run API in development with auto-reload
-- `npm run dev:full` - start Postgres and run the API in development
-- `npm run build` - compile TypeScript to `dist`
-- `npm run lint` - run ESLint across the project
-- `npm run format` - format the project with Prettier
-- `npm run test` - run the Vitest suite once
-- `npm run test:watch` - run Vitest in watch mode
-- `npm run test:coverage` - run Vitest with 100% coverage thresholds enabled
-- `npm run start` - run compiled server
-- `npm run square:fetch` - fetch catalog data from Square
-- `npm run square:seed:sandbox` - seed sample catalog items into Square sandbox (safe-guarded to sandbox env)
-- `npm run square:sync:wines` - sync Square catalog wines into the database
-- `npm run seed:sample:data` - seed local DB, seed Square sandbox catalog, then sync Square data into local wines
-- `npm run admin:grant -- <email>` - grant admin role to an existing user
-- `npm run admin:revoke -- <email>` - revoke admin role from a user
-- `npm run prisma:generate` - generate Prisma client
-- `npm run prisma:migrate` - run migrations in development
-- `npx prisma migrate deploy` - apply committed migrations in CI/staging/production
-- `npm run prisma:seed` - seed sample data
-- `npm run db:up` - start the local Postgres container
-- `npm run db:down` - stop the local Postgres container
-- `npm run db:status` - inspect the local Postgres container
-- `npm run db:logs` - tail Postgres container logs
-- `npm run db:reset` - destroy the local Postgres data volume
-- `npm run db:setup` - start Postgres, run migrations, and seed data
-
-## Environment Variables
-
-Use `.env.example` as a template:
-
-- `NODE_ENV`
-- `PORT`
-- `DATABASE_URL`
-- `JWT_SECRET`
-- `JWT_EXPIRES_IN`
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_REDIRECT_URI`
-- `SQUARE_ACCESS_TOKEN`
-- `SQUARE_ENVIRONMENT`
-- `SQUARE_SYNC_ENABLED`
-- `SQUARE_SYNC_CRON`
-
-For sample-data seeding workflows, set `SQUARE_ENVIRONMENT=sandbox` and use a Square sandbox access token.
+For the full scripts reference and environment variable setup, see [Development Setup](docs/development-setup.md) and [Environment Configuration](docs/environment.md).
 
 ## Scheduled Square Sync
 
