@@ -50,5 +50,8 @@ jobs:
       - name: Validate Prisma schema
         run: npx prisma validate
 
+      - name: Apply Prisma migrations
+        run: npx prisma migrate deploy
+
       - name: Build TypeScript
         run: npm run build

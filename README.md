@@ -58,6 +58,12 @@ cp .env.example .env
 npx prisma migrate dev
 ```
 
+For first deployment (and all non-development environments), use deploy-mode migrations:
+
+```bash
+npx prisma migrate deploy
+```
+
 5. Seed sample data:
 
 ```bash
@@ -91,6 +97,7 @@ API runs at `http://localhost:4000` by default.
 - `npm run admin:revoke -- <email>` - revoke admin role from a user
 - `npm run prisma:generate` - generate Prisma client
 - `npm run prisma:migrate` - run migrations in development
+- `npx prisma migrate deploy` - apply committed migrations in CI/staging/production
 - `npm run prisma:seed` - seed sample data
 - `npm run db:up` - start the local Postgres container
 - `npm run db:down` - stop the local Postgres container

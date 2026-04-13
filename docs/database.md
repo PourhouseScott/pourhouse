@@ -67,6 +67,35 @@ Models:
 
 Migrations are managed by Prisma Migrate. Each migration is a SQL file stored under `prisma/migrations/` and checked into version control.
 
+### Pre-Production Rebaseline (Issue 43)
+
+Before first production deployment, migration history was rebaselined to a single canonical migration.
+
+Completed artifacts:
+
+- Backup created at `prisma/backups/dev-schema-backup-issue43.sql`
+- Single baseline migration at `prisma/migrations/20260413150000_baseline/migration.sql`
+
+Why this was done:
+
+- No production database had been deployed yet
+- Schema had evolved quickly during early feature development
+- A single baseline avoids long-term migration drift and simplifies first deploy
+
+Team workflow after rebaseline:
+
+1. Keep baseline migration untouched.
+2. Add all future schema changes as normal incremental migrations.
+3. Validate with `npx prisma validate` and regenerate client with `npx prisma generate`.
+4. In CI/CD and production, apply migrations with `npx prisma migrate deploy`.
+
+First production deploy notes:
+
+1. Ensure target production database is empty and not previously migrated.
+2. Apply baseline migration with `npx prisma migrate deploy`.
+3. Run `npx prisma migrate status` and confirm database and migration history are in sync.
+4. Run application smoke checks after deploy.
+
 To create and apply a new migration after editing `schema.prisma`:
 
 ```bash
