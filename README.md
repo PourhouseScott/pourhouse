@@ -278,41 +278,7 @@ Example `GET /api/wines/grouped` response:
 
 The embeddable wine list is available at `GET /embed/wine-list` and loads grouped wines from `GET /api/wines/grouped`.
 
-### Iframe Embed
-
-```html
-<iframe
-  src="https://your-domain.example/embed/wine-list"
-  style="width:100%;height:780px;border:0;display:block"
-  loading="lazy"
-></iframe>
-```
-
-Optional compact mode:
-
-```html
-<iframe
-  src="https://your-domain.example/embed/wine-list?compact=true"
-  style="width:100%;height:700px;border:0;display:block"
-  loading="lazy"
-></iframe>
-```
-
-### Script Embed
-
-Load the helper script and mount the iframe programmatically:
-
-```html
-<div id="pourhouse-wine-list"></div>
-<script src="https://your-domain.example/static/wine-list-embed-loader.js"></script>
-<script>
-  window.createPourhouseWineListEmbed(document.getElementById("pourhouse-wine-list"), {
-    baseUrl: "https://your-domain.example",
-    compact: false,
-    height: "780px"
-  });
-</script>
-```
+For complete Squarespace embed instructions (iframe and loader options), security header guidance, scheduler expectations, and troubleshooting, see `docs/squarespace-integration.md`.
 
 Example `POST /api/wines` request body:
 
