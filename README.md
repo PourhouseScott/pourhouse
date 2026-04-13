@@ -120,8 +120,18 @@ Use `.env.example` as a template:
 - `GOOGLE_REDIRECT_URI`
 - `SQUARE_ACCESS_TOKEN`
 - `SQUARE_ENVIRONMENT`
+- `SQUARE_SYNC_ENABLED`
+- `SQUARE_SYNC_CRON`
 
 For sample-data seeding workflows, set `SQUARE_ENVIRONMENT=sandbox` and use a Square sandbox access token.
+
+## Scheduled Square Sync
+
+The API supports a background scheduler that fetches Square catalog data and syncs it into local wines/inventory.
+
+- Set `SQUARE_SYNC_ENABLED=true` to turn on the scheduler.
+- Set `SQUARE_SYNC_CRON` to control the interval (default: `*/10 * * * *`, every 10 minutes).
+- Each run logs start, completion summary (created/updated/skipped/inventoryRowsSynced), and failures.
 
 ## Sample Data Seeding
 

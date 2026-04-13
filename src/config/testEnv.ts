@@ -9,3 +9,5 @@ process.env.GOOGLE_CLIENT_SECRET ??= "google-client-secret-test";
 process.env.GOOGLE_REDIRECT_URI ??= "http://localhost:4000/auth/google/callback";
 process.env.SQUARE_ACCESS_TOKEN ??= "square-test-token";
 process.env.SQUARE_ENVIRONMENT ??= "sandbox";
+process.env.SQUARE_SYNC_ENABLED ??= "false";
+process.env.SQUARE_SYNC_CRON ??= "*/10 * * * *";

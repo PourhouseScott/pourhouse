@@ -3,6 +3,11 @@ import { z } from "zod";
 
 dotenv.config();
 
+const booleanEnvSchema = z
+  .enum(["true", "false"])
+  .default("false")
+  .transform((value) => value === "true");
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
@@ -13,7 +18,10 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1, "GOOGLE_CLIENT_SECRET is required"),
   GOOGLE_REDIRECT_URI: z.string().url("GOOGLE_REDIRECT_URI must be a valid URL"),
   SQUARE_ACCESS_TOKEN: z.string().min(1, "SQUARE_ACCESS_TOKEN is required"),
-  SQUARE_ENVIRONMENT: z.enum(["sandbox", "production"]).default("production")
+  SQUARE_ENVIRONMENT: z.enum(["sandbox", "production"]).default("production"),
+  SQUARE_SYNC_ENABLED: booleanEnvSchema,
+  SQUARE_SYNC_CRON: z.string().min(1, "SQUARE_SYNC_CRON is required")
+    .default("*/10 * * * *")
 });
 
 export const env = envSchema.parse(process.env);

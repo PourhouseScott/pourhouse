@@ -30,6 +30,8 @@ cp .env.example .env
 | `GOOGLE_REDIRECT_URI` | Yes | — | Callback URL registered in Google Cloud Console for the auth code flow. |
 | `SQUARE_ACCESS_TOKEN` | Yes | — | Access token used for Square catalog API requests and sync operations. |
 | `SQUARE_ENVIRONMENT` | No | `production` | Square environment selector. Accepted values: `sandbox`, `production`. |
+| `SQUARE_SYNC_ENABLED` | No | `false` | Enables the background Square-to-database sync scheduler when set to `true`. |
+| `SQUARE_SYNC_CRON` | No | `*/10 * * * *` | Cron expression used by the Square sync scheduler (default is every 10 minutes). |
 
 ## Adding a New Variable
 
