@@ -6,7 +6,7 @@ import type { AuthService } from "@/services/authService";
 vi.mock("@/config/env", () => ({
   env: {
     GOOGLE_CLIENT_ID: "google-client-id-test",
-    GOOGLE_REDIRECT_URI: "http://localhost:4000/api/auth/google/callback"
+    GOOGLE_REDIRECT_URI: "http://localhost:8080/api/auth/google/callback"
   }
 }));
 
@@ -39,7 +39,7 @@ describe("AuthController", () => {
     expect(statusCode).toBe(302);
     expect(redirectUrl).toContain("https://accounts.google.com/o/oauth2/v2/auth");
     expect(redirectUrl).toContain("client_id=google-client-id-test");
-    expect(redirectUrl).toContain("redirect_uri=http%3A%2F%2Flocalhost%3A4000%2Fapi%2Fauth%2Fgoogle%2Fcallback");
+    expect(redirectUrl).toContain("redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauth%2Fgoogle%2Fcallback");
     expect(redirectUrl).toContain("scope=openid+email+profile");
     expect(redirectUrl).toContain("state=L2FkbWluL3dpbmVz");
   });
@@ -102,7 +102,7 @@ describe("AuthController", () => {
 
     expect(authService.authenticateWithGoogle).toHaveBeenCalledWith({
       authorizationCode: "auth-code",
-      redirectUri: "http://localhost:4000/api/auth/google/callback"
+      redirectUri: "http://localhost:8080/api/auth/google/callback"
     });
     expect(res.redirect).toHaveBeenCalledWith(302, "/admin/wines#token=token-value");
   });

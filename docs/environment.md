@@ -21,7 +21,7 @@ cp .env.example .env
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `NODE_ENV` | No | `development` | Runtime environment. Accepted values: `development`, `test`, `production`. |
-| `PORT` | No | `4000` | Port the HTTP server listens on. |
+| `PORT` | No | `8080` | Port the HTTP server listens on. |
 | `DATABASE_URL` | Yes | — | PostgreSQL connection string. Example: `postgresql://postgres:postgres@localhost:5432/pourhouse?schema=public` |
 | `JWT_SECRET` | Yes | — | Secret used to sign and verify JWTs. Must be at least 16 characters. |
 | `JWT_EXPIRES_IN` | No | `7d` | JWT expiry duration in [vercel/ms](https://github.com/vercel/ms) format (e.g. `7d`, `1h`, `30m`). |

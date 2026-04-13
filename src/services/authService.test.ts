@@ -54,7 +54,7 @@ describe("AuthService", () => {
 
     expect(googleAuthClient.exchangeAuthorizationCode).toHaveBeenCalledWith({
       authorizationCode: "auth-code",
-      redirectUri: "http://localhost:4000/auth/google/callback"
+      redirectUri: "http://localhost:8080/auth/google/callback"
     });
     expect(result.user).toEqual({
       id: "user-1",
@@ -103,12 +103,12 @@ describe("AuthService", () => {
 
     const result = await service.authenticateWithGoogle({
       authorizationCode: "auth-code",
-      redirectUri: "http://localhost:4000/custom-google-callback"
+      redirectUri: "http://localhost:8080/custom-google-callback"
     });
 
     expect(googleAuthClient.exchangeAuthorizationCode).toHaveBeenCalledWith({
       authorizationCode: "auth-code",
-      redirectUri: "http://localhost:4000/custom-google-callback"
+      redirectUri: "http://localhost:8080/custom-google-callback"
     });
     expect(userRepository.updateGoogleIdentityById).toHaveBeenCalledWith({
       userId: "user-2",
@@ -188,7 +188,7 @@ describe("GoogleAuthClient", () => {
     const client = new GoogleAuthClient();
     const result = await client.exchangeAuthorizationCode({
       authorizationCode: "auth-code",
-      redirectUri: "http://localhost:4000/auth/google/callback"
+      redirectUri: "http://localhost:8080/auth/google/callback"
     });
 
     expect(result).toEqual({ idToken: "id-token" });
@@ -205,7 +205,7 @@ describe("GoogleAuthClient", () => {
     await expect(
       client.exchangeAuthorizationCode({
         authorizationCode: "auth-code",
-        redirectUri: "http://localhost:4000/auth/google/callback"
+        redirectUri: "http://localhost:8080/auth/google/callback"
       })
     ).rejects.toEqual(new AppError("Google authentication failed", 401));
   });
@@ -221,7 +221,7 @@ describe("GoogleAuthClient", () => {
     await expect(
       client.exchangeAuthorizationCode({
         authorizationCode: "auth-code",
-        redirectUri: "http://localhost:4000/auth/google/callback"
+        redirectUri: "http://localhost:8080/auth/google/callback"
       })
     ).rejects.toEqual(new AppError("Google authentication failed", 401));
   });

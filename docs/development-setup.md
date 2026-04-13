@@ -49,7 +49,7 @@ npm run prisma:seed
 npm run dev
 ```
 
-API runs at `http://localhost:4000` by default.
+API runs at `http://localhost:8080` by default.
 
 ## Sample Data Workflow
 
