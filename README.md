@@ -78,6 +78,17 @@ npm run dev
 
 API runs at `http://localhost:4000` by default.
 
+## Documentation Index
+
+- [Documentation Home](docs/index.md)
+- [Architecture](docs/architecture.md)
+- [Environment Configuration](docs/environment.md)
+- [Database](docs/database.md)
+- [API Reference](docs/api-reference.md)
+- [Domain Rules](docs/domain-rules.md)
+- [Squarespace Integration Runbook](docs/squarespace-integration.md)
+- [Square Data Structure and Integration Model](docs/square-integration-model.md)
+
 ## Scripts
 
 - `npm run dev` - run API in development with auto-reload
@@ -133,7 +144,7 @@ The API supports a background scheduler that fetches Square catalog data and syn
 - Set `SQUARE_SYNC_CRON` to control the interval (default: `*/10 * * * *`, every 10 minutes).
 - Each run logs start, completion summary (created/updated/skipped/inventoryRowsSynced), and failures.
 
-For Squarespace embed setup, security header guidance, and troubleshooting, see `docs/squarespace-integration.md`.
+For detailed integration usage, see [Squarespace Integration Runbook](docs/squarespace-integration.md).
 
 ## Sample Data Seeding
 
@@ -153,184 +164,7 @@ When `sample_data/*.xlsx` exists, `npm run square:seed:sandbox` reads the newest
 
 You can also run individual steps as needed.
 
-## API Endpoints
+## API and Rules
 
-### Auth
-
-- `GET /api/auth/google/start` - redirects browser to Google OAuth consent
-- `GET /api/auth/google/callback` - exchanges Google code and redirects back with app JWT
-- `POST /api/auth/google`
-
-### Wines
-
-- `GET /api/wines` - returns a paginated wine list with optional filters and public availability flags
-- `GET /api/wines/grouped` - returns wines grouped by inferred type, then by region
-- `GET /api/wines/:slug`
-- `GET /api/wines/qr/:code` - resolves a QR code token (slug or Square item id) and redirects to `/wines/:slug`
-- `POST /api/wines` - creates a wine and generates its slug from `name` + `vintage`
-- `GET /api/wines/search?q=term`
-- `GET /api/wines/:id/ratings`
-
-### Admin Wines
-
-Admin routes require `Authorization: Bearer <app-jwt>`, and the authenticated user must have `role=ADMIN` in the database.
-The admin UI at `/admin/wines` now uses Google sign-in and stores the app JWT in browser local storage.
-
-- `GET /api/admin/wines`
-- `POST /api/admin/wines`
-- `PUT /api/admin/wines/:id`
-- `DELETE /api/admin/wines/:id`
-
-Supported `GET /api/wines` query params:
-
-- `page` - 1-based page number, defaults to `1`
-- `pageSize` - page size between `1` and `100`, defaults to `20`
-- `sort` - `createdAt`, `name`, `priceGlass`, or `priceBottle`
-- `order` - `asc` or `desc`
-- `country` - exact country filter, case-insensitive
-- `regionId` - filter by region id
-- `wineryId` - filter by winery id
-- `featuredOnly` - `true` or `false`
-- `hasGlass` - `true` or `false`
-- `hasBottle` - `true` or `false`
-
-Example `GET /api/wines` response:
-
-```json
-{
-  "items": [
-    {
-      "id": "wine-id",
-      "slug": "cabernet-2020",
-      "name": "Cabernet",
-      "vintage": 2020,
-      "country": "US",
-      "description": "Bold",
-      "imageUrl": "https://example.com/wine.png",
-      "winery": {
-        "id": "winery-1",
-        "name": "Alpha Winery"
-      },
-      "region": {
-        "id": "region-1",
-        "name": "Napa Valley"
-      },
-      "availableByBottle": true,
-      "availableByGlass": true,
-      "availableForFlight": false
-    }
-  ],
-  "page": 1,
-  "pageSize": 20,
-  "total": 1,
-  "totalPages": 1
-}
-```
-
-Example filtered request:
-
-```text
-GET /api/wines?page=1&pageSize=10&sort=priceGlass&order=asc&country=US&featuredOnly=true
-```
-
-Example `GET /api/wines/grouped` response:
-
-```json
-{
-  "groups": [
-    {
-      "type": "red",
-      "regions": [
-        {
-          "id": "region-1",
-          "name": "Napa Valley",
-          "wines": [
-            {
-              "id": "wine-id",
-              "slug": "cabernet-2020",
-              "name": "Cabernet",
-              "vintage": 2020,
-              "country": "US",
-              "description": "Bold",
-              "imageUrl": "https://example.com/wine.png",
-              "winery": {
-                "id": "winery-1",
-                "name": "Alpha Winery"
-              },
-              "region": {
-                "id": "region-1",
-                "name": "Napa Valley"
-              },
-              "availableByBottle": true,
-              "availableByGlass": true,
-              "availableForFlight": false
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "totalWines": 1
-}
-```
-
-## Embeddable Wine List
-
-The embeddable wine list is available at `GET /embed/wine-list` and loads grouped wines from `GET /api/wines/grouped`.
-
-For complete Squarespace embed instructions (iframe and loader options), security header guidance, scheduler expectations, and troubleshooting, see `docs/squarespace-integration.md`.
-
-Example `POST /api/wines` request body:
-
-```json
-{
-  "name": "Opus One",
-  "vintage": 2019,
-  "wineryId": "winery-id",
-  "regionId": "region-id",
-  "country": "US",
-  "grapeVarieties": ["Cabernet Sauvignon", "Merlot"],
-  "alcoholPercent": 14.5,
-  "description": "Structured and age-worthy.",
-  "imageUrl": "https://example.com/opus-one.png"
-}
-```
-
-Generated slugs are based on `name` + `vintage` and receive a numeric suffix when needed to stay unique, for example `opus-one-2019` or `opus-one-2019-2`.
-
-### Inventory
-
-- `GET /api/inventory`
-- `GET /api/inventory/:id`
-- `POST /api/inventory`
-- `PATCH /api/inventory/:id`
-
-### Ratings
-
-- `POST /api/ratings` (requires JWT)
-
-### Frontend Page
-
-- `GET /wines/:slug` - mobile-friendly wine detail page that loads data from `GET /api/wines/:slug` and displays name, description, and pricing
-
-## Business Rules Implemented
-
-- Duplicate wines prevented by composite unique constraint on `(name, wineryId, vintage)`.
-- Ratings constrained to 1-5 by validation and service guard.
-- Only authenticated users can create ratings.
-- Inventory references wines by foreign key (`wineId`) and does not duplicate wine records.
-- Public wine list responses include only wines with available inventory.
-- Public wine list pricing is summarized from available inventory rows using the lowest available glass and bottle prices.
-- Public wine list filtering is applied in the repository layer; price sorting and pagination are applied in the service layer.
-
-## Seed Data
-
-Seed includes:
-
-- Regions (France, Bordeaux, Napa Valley)
-- Wineries
-- Wines
-- Inventory records
-- Default user email (`admin@pourhousewineco.com`) for Google identity linking and role assignment
-
-Grant or revoke admin access with `npm run admin:grant -- <email>` and `npm run admin:revoke -- <email>`.
+- For endpoints, request/response examples, and query parameters, see [API Reference](docs/api-reference.md).
+- For business constraints and behavior guarantees, see [Domain Rules](docs/domain-rules.md).

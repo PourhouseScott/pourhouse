@@ -49,11 +49,18 @@ Models:
 | Model | Description |
 |---|---|
 | `Wine` | Core wine record; unique on `(name, wineryId, vintage)`. Has a unique `slug` for URL-safe identification and an optional unique `squareItemId` for Square POS integration. |
+| `WineVariation` | Price/size variation records for a wine, including optional `squareVariationId` mapping. |
+| `WineVariationServingMode` | Serving-mode metadata (for example `GLASS_5OZ`, `BOTTLE_750ML`) associated with a variation. |
 | `Winery` | Wine producer; belongs to a `Region` |
 | `Region` | Hierarchical geographic region (self-referencing) |
+| `Flight` | Curated tasting flight definition. |
+| `FlightWine` | Join model between flights and wines with pour position ordering. |
 | `Inventory` | Per-wine stock, pricing, and availability |
 | `User` | Application user account |
 | `Rating` | User rating (1–5) with optional notes for a wine |
+| `SquareCatalogItem` | Staging record of synced Square item payloads and sync metadata. |
+| `SquareCatalogVariation` | Staging record of synced Square variation payloads and sync metadata. |
+| `SquareServingModeOverride` | Manual override mapping from Square variation id to serving mode. |
 
 ### Scripts
 

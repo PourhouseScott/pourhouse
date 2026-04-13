@@ -1,5 +1,11 @@
 # Square Data Structure & Integration Model
 
+## Document Status
+
+- This document combines historical context and design notes from Issue #14.
+- Parts labeled as "proposed" are architectural reference, not guaranteed current behavior.
+- For operational embed setup and production configuration, use `docs/squarespace-integration.md`.
+
 ## Overview
 
 Square provides catalog data via the Catalog API. This document outlines:
