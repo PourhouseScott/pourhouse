@@ -133,6 +133,8 @@ The API supports a background scheduler that fetches Square catalog data and syn
 - Set `SQUARE_SYNC_CRON` to control the interval (default: `*/10 * * * *`, every 10 minutes).
 - Each run logs start, completion summary (created/updated/skipped/inventoryRowsSynced), and failures.
 
+For Squarespace embed setup, security header guidance, and troubleshooting, see `docs/squarespace-integration.md`.
+
 ## Sample Data Seeding
 
 Use the combined command when you want realistic demo data in both Square sandbox and your local database:
