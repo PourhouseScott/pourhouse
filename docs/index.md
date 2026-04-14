@@ -13,6 +13,7 @@ Use this page as the entry point for project documentation.
 ## Integration and Operations
 
 - [Squarespace Integration Runbook](squarespace-integration.md)
+- [Google Cloud Build (Docker)](google-cloud-build-docker.md)
 - [Square Data Structure and Integration Model](square-integration-model.md)
 - [Domain Rules](domain-rules.md)
 

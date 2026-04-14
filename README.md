@@ -45,6 +45,7 @@ For prerequisites, local environment setup, database migration flow, and sample-
 - [API Reference](docs/api-reference.md)
 - [Domain Rules](docs/domain-rules.md)
 - [Squarespace Integration Runbook](docs/squarespace-integration.md)
+- [Google Cloud Build (Docker)](docs/google-cloud-build-docker.md)
 - [Square Data Structure and Integration Model](docs/square-integration-model.md)
 
 ## Scheduled Square Sync
