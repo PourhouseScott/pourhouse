@@ -1,52 +1,57 @@
+<div id="pourhouse-display-root">
+  <p style="text-align: center; color: #666; font-family: sans-serif; letter-spacing: 1px;">Opening the cellar...</p>
+</div>
+
 <script>
 (function() {
   const root = document.getElementById('pourhouse-display-root');
-  const CLOUD_RUN_URL = 'https://pourhouse-779220128919.europe-west1.run.app';
-  const API_ENDPOINT = `${CLOUD_RUN_URL}/api/wines`;
+
+  // UPDATED TO OREGON (US-WEST1) URL
+  const API_URL = 'https://pourhouse-779220128919.us-west1.run.app/api/wines';
 
   async function fetchWines() {
     try {
-      const response = await fetch(API_ENDPOINT);
-      console.log('Pourhouse Sync Response:', response);
+      const response = await fetch(API_URL, {
+        method: 'GET',
+        mode: 'cors', // Explicitly request CORS
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
       if (!response.ok) {
-        throw new Error(`Server responded with status ${response.status}`);
+        const errorDetail = await response.text();
+        throw new Error(`Syncing: ${response.status}`);
       }
 
-      const groupedData = await response.json();
+      const wines = await response.json();
 
-      // If the data comes back empty
-      if (!groupedData || Object.keys(groupedData).length === 0) {
-        root.innerHTML = "<p>Our wine list is being updated. Check back shortly!</p>";
+      if (!wines || wines.length === 0) {
+        root.innerHTML = "<p style='text-align:center; font-style:italic;'>Our wine list is currently being updated. Please check back shortly!</p>";
         return;
       }
 
-      let html = '';
-
-      // Loop through categories (Red, White, etc.)
-      for (const [category, wines] of Object.entries(groupedData)) {
-        html += `<h2 class="ph-category-title">${category}</h2>`;
-        html += '<div class="ph-grid">';
-
-        wines.forEach(wine => {
-          html += `
-            <div class="ph-wine-card">
-              <div class="ph-header">
-                <span class="ph-name">${wine.name}</span>
-                <span class="ph-price">$${wine.price}</span>
-              </div>
-              <div class="ph-meta">${wine.varietal || ''} — ${wine.region || ''}</div>
-              <p class="ph-desc">${wine.notes || ''}</p>
+      let html = '<div class="ph-grid">';
+      wines.forEach(wine => {
+        html += `
+          <div class="ph-wine-card">
+            <div class="ph-header">
+              <span class="ph-name">${wine.name}</span>
+              <span class="ph-price">$${wine.price || ''}</span>
             </div>
-          `;
-        });
-        html += '</div>';
-      }
-
+            <p class="ph-meta">${wine.varietal || ''} — ${wine.region || ''}</p>
+          </div>
+        `;
+      });
+      html += '</div>';
       root.innerHTML = html;
+
     } catch (err) {
       console.error('Pourhouse Sync Error:', err);
-      // Displaying the specific error helps us debug
-      root.innerHTML = `<p style="color: grey;">Our live list is currently resting. (Error: ${err.message})</p>`;
+      // Fallback message for visitors if the API is still handshaking
+      root.innerHTML = `<div style="text-align:center; color: #999; font-size: 13px; padding: 40px 20px; border-top: 1px solid #eee;">
+        Our live cellar list is currently updating. <br>Please see our menu at the bar for today's full selection.
+      </div>`;
     }
   }
 
@@ -55,29 +60,37 @@
 </script>
 
 <style>
-  .ph-category-title {
-    border-bottom: 2px solid #4a0e0e;
-    margin: 40px 0 20px 0;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 1.5rem;
-  }
   .ph-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 25px;
+    gap: 30px;
+    padding: 20px 0;
   }
   @media (min-width: 768px) {
-    .ph-grid { grid-template-columns: 1fr 1fr; }
+    .ph-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
   }
-  .ph-wine-card { padding: 10px 0; }
+  .ph-wine-card {
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 15px;
+    font-family: "proxima-nova", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
   .ph-header {
     display: flex;
     justify-content: space-between;
-    font-weight: bold;
+    align-items: baseline;
+    font-weight: 600;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     font-size: 1.1rem;
   }
-  .ph-name { color: #4a0e0e; }
-  .ph-meta { font-style: italic; color: #666; font-size: 0.9rem; margin-bottom: 5px; }
-  .ph-desc { font-size: 0.95rem; }
+  .ph-name { flex: 1; padding-right: 10px; }
+  .ph-price { color: #4a0e0e; }
+  .ph-meta {
+    font-style: italic;
+    color: #777;
+    font-size: 0.95rem;
+    margin-top: 8px;
+    font-weight: 300;
+  }
 </style>
