@@ -1,19 +1,27 @@
 import app from "./app";
 import { env } from "./config/env";
 import { startSquareSyncScheduler } from "./integrations/square/squareSyncScheduler";
+import cors from 'cors';
 
-// 1. Define the Port and Host
 const PORT = Number(env.PORT) || 8080;
 const HOST = '0.0.0.0';
 
-// 2. Start the server FIRST (to satisfy Google's health check immediately)
+app.use(cors({
+  origin: [
+    'https://www.pourhousewineco.com',
+    'https://pourhousewineco.com',
+    'https://pourhouse-wine-co.squarespace.com' // internal dev domain
+  ],
+  methods: ['GET', 'POST'],
+  credentials: true
+}));
+
 const server = app.listen(PORT, HOST, () => {
   console.log(`-----------------------------------------`);
   console.log(`Pourhouse Wine Co. API live on port ${PORT}`);
   console.log(`Binding to host ${HOST}`);
   console.log(`-----------------------------------------`);
 
-  // 3. Start the scheduler AFTER the server is successfully listening
   try {
     const squareSyncScheduler = startSquareSyncScheduler();
 
