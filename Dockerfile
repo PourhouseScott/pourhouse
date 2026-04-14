@@ -28,6 +28,4 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY public ./public
 
-EXPOSE 8080
-
 CMD ["node", "dist/server.js"]
