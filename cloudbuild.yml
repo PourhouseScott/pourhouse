@@ -1,9 +1,27 @@
 steps:
+  # Step 1: Build the container image
   - name: 'gcr.io/cloud-builders/docker'
     args: [
       'build',
       '-t', 'gcr.io/$PROJECT_ID/github.com/pourhousescott/pourhouse:$COMMIT_SHA',
       '.'
     ]
+
+  # Step 2: Push the image to the registry so Cloud Run can see it
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/github.com/pourhousescott/pourhouse:$COMMIT_SHA']
+
+  # Step 3: Deploy the new image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'pourhouse'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/github.com/pourhousescott/pourhouse:$COMMIT_SHA'
+      - '--region'
+      - 'us-west1'
+
 options:
   logging: CLOUD_LOGGING_ONLY
